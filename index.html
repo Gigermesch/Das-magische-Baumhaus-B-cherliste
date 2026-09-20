@@ -1,0 +1,1143 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#123f35">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Baumhaus-Bücher">
+  <meta name="description" content="Meine Sammlung der Buchreihe Das magische Baumhaus.">
+  <title>Meine magischen Baumhaus-Bücher</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23123f35'/%3E%3Cpath d='M14 31 32 15l18 16v21H14z' fill='%23f1c766'/%3E%3Cpath d='M8 32 32 10l24 22-5 5-19-18-19 18z' fill='%23fff7dd'/%3E%3Cpath d='M27 38h10v14H27z' fill='%23123f35'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --forest: #123f35;
+      --forest-2: #1d5b4d;
+      --cream: #fbf7ed;
+      --paper: #fffdf8;
+      --gold: #e8b84a;
+      --gold-light: #f5db92;
+      --ink: #1f2a26;
+      --muted: #68756f;
+      --line: #dce4df;
+      --owned: #dcefe7;
+      --danger: #a23c33;
+      --shadow: 0 14px 36px rgba(20, 47, 40, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { background: var(--forest); }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% -10%, rgba(245, 219, 146, .32), transparent 34rem),
+        var(--cream);
+      font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+
+    .hero {
+      color: white;
+      background:
+        radial-gradient(circle at 85% 18%, rgba(232, 184, 74, .25), transparent 22rem),
+        linear-gradient(155deg, #0c342c, var(--forest-2));
+      padding: calc(24px + env(safe-area-inset-top)) 18px 28px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -45px;
+      bottom: -70px;
+      width: 210px;
+      height: 210px;
+      border: 2px solid rgba(255, 255, 255, .1);
+      border-radius: 44% 56% 62% 38%;
+      transform: rotate(18deg);
+    }
+
+    .hero-inner, main { max-width: 980px; margin: 0 auto; }
+
+    .eyebrow {
+      margin: 0 0 7px;
+      color: var(--gold-light);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 680px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 7vw, 3.7rem);
+      font-weight: 700;
+      letter-spacing: -.035em;
+      line-height: 1.03;
+    }
+
+    .hero-copy {
+      max-width: 600px;
+      margin: 12px 0 22px;
+      color: rgba(255, 255, 255, .78);
+    }
+
+    .progress-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px 14px;
+      align-items: center;
+      max-width: 650px;
+    }
+
+    .progress-track {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, .14);
+    }
+
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--gold), #ffe5a4);
+      transition: width .35s ease;
+    }
+
+    .progress-count { font-weight: 800; white-space: nowrap; }
+
+    .collection-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .collection-stats span {
+      padding: 6px 10px;
+      border: 1px solid rgba(255,255,255,.17);
+      border-radius: 999px;
+      color: rgba(255,255,255,.78);
+      background: rgba(255,255,255,.07);
+      font-size: .82rem;
+    }
+
+    .collection-stats b { color: white; }
+
+    main { padding: 18px 14px calc(40px + env(safe-area-inset-bottom)); }
+
+    .controls {
+      position: sticky;
+      z-index: 10;
+      top: 0;
+      margin: 0 0 18px;
+      padding: 12px;
+      border: 1px solid rgba(220, 228, 223, .9);
+      border-radius: 18px;
+      background: rgba(251, 247, 237, .94);
+      box-shadow: 0 8px 25px rgba(20, 47, 40, .08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .search-wrap { position: relative; }
+
+    .search-wrap svg {
+      position: absolute;
+      top: 50%;
+      left: 14px;
+      width: 19px;
+      color: var(--muted);
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    #search {
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 42px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      outline: 0;
+      background: white;
+    }
+
+    #search:focus { border-color: var(--forest-2); box-shadow: 0 0 0 3px rgba(29, 91, 77, .12); }
+
+    .clear-search {
+      position: absolute;
+      top: 50%;
+      right: 7px;
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      font-size: 1.35rem;
+      transform: translateY(-50%);
+      cursor: pointer;
+    }
+
+    .control-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .control-row::-webkit-scrollbar { display: none; }
+
+    .filter-btn, .utility-btn, #sort {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: white;
+      padding: 8px 13px;
+      white-space: nowrap;
+    }
+
+    .filter-btn { cursor: pointer; font-weight: 750; }
+    .filter-btn.active { border-color: var(--forest); color: white; background: var(--forest); }
+    .spacer { flex: 1; }
+    #sort { min-width: 128px; outline: 0; }
+
+    .result-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      margin: 0 4px 11px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    #books { display: grid; gap: 11px; }
+
+    .book-card {
+      display: grid;
+      grid-template-columns: 68px minmax(0, 1fr);
+      gap: 13px;
+      align-items: center;
+      min-height: 110px;
+      padding: 10px 11px 10px 10px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--paper);
+      box-shadow: 0 5px 16px rgba(20, 47, 40, .055);
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+
+    .book-card.owned { border-color: #a6cbbb; background: linear-gradient(105deg, var(--owned), var(--paper) 48%); }
+    .book-card.wished:not(.owned) { border-color: #e2b7b2; background: linear-gradient(105deg, #f9e9e7, var(--paper) 48%); }
+
+    .mini-cover {
+      position: relative;
+      display: grid;
+      place-items: center;
+      align-self: start;
+      width: 68px;
+      min-height: 0;
+      aspect-ratio: 2 / 3;
+      overflow: hidden;
+      border-radius: 9px 13px 13px 9px;
+      color: white;
+      background:
+        linear-gradient(145deg, hsla(var(--hue), 65%, 58%, .92), hsla(calc(var(--hue) + 28), 52%, 28%, .98));
+      box-shadow: inset 5px 0 rgba(0, 0, 0, .15), 0 5px 10px rgba(20, 47, 40, .15);
+    }
+
+    .mini-cover::before {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 6px 9px 9px 6px;
+    }
+
+    .book-icon { z-index: 1; font-size: 1.7rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,.2)); }
+    .cover-no { position: absolute; z-index: 1; right: 7px; bottom: 5px; font-size: .68rem; font-weight: 900; }
+
+    .mini-cover img {
+      position: absolute;
+      z-index: 3;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      object-fit: cover;
+      background: white;
+    }
+
+    .book-copy { min-width: 0; }
+    .band { margin: 0 0 2px; color: var(--forest-2); font-size: .76rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .book-title { margin: 0; font: 700 1.06rem/1.18 Georgia, "Times New Roman", serif; }
+    .topic { margin: 5px 0 8px; color: var(--muted); font-size: .84rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .info-btn {
+      margin: 0;
+      padding: 4px 0;
+      border: 0;
+      color: var(--forest-2);
+      background: transparent;
+      font-size: .84rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .status-actions {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+      padding-top: 2px;
+    }
+
+    .status-btn {
+      min-height: 38px;
+      padding: 7px 6px;
+      border: 1px solid #cfd9d4;
+      border-radius: 11px;
+      color: var(--muted);
+      background: white;
+      font-size: .77rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .15s ease, background .18s ease, color .18s ease;
+    }
+
+    .status-btn[data-status="owned"][aria-pressed="true"],
+    .status-btn[data-status="read"][aria-pressed="true"] {
+      border-color: var(--forest-2);
+      color: white;
+      background: var(--forest-2);
+    }
+
+    .status-btn[data-status="wishlist"][aria-pressed="true"] {
+      border-color: #a74a45;
+      color: white;
+      background: #a74a45;
+    }
+
+    .status-btn:active { transform: scale(.97); }
+
+    .empty {
+      padding: 46px 20px;
+      border: 1px dashed #c7d2cc;
+      border-radius: 18px;
+      color: var(--muted);
+      text-align: center;
+      background: rgba(255,255,255,.55);
+    }
+
+    .footer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 28px;
+    }
+
+    .utility-btn {
+      cursor: pointer;
+      color: var(--forest);
+      font-weight: 700;
+    }
+
+    .utility-btn.danger { color: var(--danger); }
+    #importFile { display: none; }
+
+    .footnote { margin: 18px auto 0; max-width: 680px; color: var(--muted); font-size: .78rem; text-align: center; }
+    .footnote a { color: var(--forest-2); }
+
+    .modal-backdrop {
+      position: fixed;
+      z-index: 50;
+      inset: 0;
+      display: grid;
+      align-items: end;
+      padding: 20px 12px calc(12px + env(safe-area-inset-bottom));
+      background: rgba(4, 20, 16, .58);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    .modal-backdrop[hidden] { display: none; }
+
+    .modal {
+      width: min(100%, 590px);
+      max-height: min(82vh, 680px);
+      margin: 0 auto;
+      overflow: auto;
+      border-radius: 24px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      animation: rise .2s ease-out;
+    }
+
+    @keyframes rise { from { opacity: 0; transform: translateY(24px); } }
+
+    .modal-art {
+      display: grid;
+      place-items: center;
+      min-height: 280px;
+      padding: 20px;
+      color: white;
+      background:
+        radial-gradient(circle at 50% 135%, rgba(255,255,255,.25), transparent 50%),
+        linear-gradient(135deg, var(--forest), var(--forest-2));
+      font-size: 3.3rem;
+    }
+
+    .modal-art > * { grid-area: 1 / 1; }
+
+    .modal-art img {
+      z-index: 1;
+      width: auto;
+      max-width: min(190px, 70vw);
+      max-height: 250px;
+      border-radius: 8px 14px 14px 8px;
+      object-fit: contain;
+      background: white;
+      box-shadow: 0 14px 28px rgba(0,0,0,.28);
+    }
+
+    .modal-body { padding: 20px; }
+    .modal-body h2 { margin: 4px 0 10px; font: 700 1.7rem/1.1 Georgia, "Times New Roman", serif; }
+    .modal-body p { margin: 0 0 14px; }
+
+    .fact-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 18px 0; }
+    .fact { padding: 11px; border: 1px solid var(--line); border-radius: 12px; background: white; }
+    .fact small { display: block; color: var(--muted); font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .fact strong { display: block; margin-top: 2px; }
+
+    .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .modal-actions a, .modal-actions button {
+      display: grid;
+      place-items: center;
+      min-height: 46px;
+      border: 1px solid var(--forest);
+      border-radius: 13px;
+      text-decoration: none;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .modal-actions a { color: white; background: var(--forest); }
+    .modal-actions button { color: var(--forest); background: transparent; }
+
+    .toast {
+      position: fixed;
+      z-index: 70;
+      left: 50%;
+      bottom: calc(22px + env(safe-area-inset-bottom));
+      max-width: calc(100% - 28px);
+      padding: 11px 16px;
+      border-radius: 999px;
+      color: white;
+      background: #15251f;
+      box-shadow: var(--shadow);
+      font-size: .9rem;
+      font-weight: 700;
+      transform: translateX(-50%);
+    }
+    .toast[hidden] { display: none; }
+
+    @media (min-width: 720px) {
+      main { padding-top: 24px; }
+      .controls { display: grid; grid-template-columns: minmax(240px, 1fr) auto; gap: 10px; align-items: center; padding: 14px; }
+      .control-row { margin: 0; }
+      #books { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .book-card { grid-template-columns: 68px minmax(0, 1fr); }
+      .modal-backdrop { align-items: center; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Meine Büchersammlung</p>
+      <h1>Das magische Baumhaus</h1>
+      <p class="hero-copy">Behalte Besitz, Lesestand und Wunschliste für alle 63 Bände im Blick. Deine Auswahl bleibt auf diesem Gerät gespeichert.</p>
+      <div class="progress-row" aria-label="Sammlungsfortschritt">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-count"><span id="ownedCount">0</span> von 63</div>
+      </div>
+      <div class="collection-stats">
+        <span><b id="readCount">0</b> gelesen</span>
+        <span><b id="wishlistCount">0</b> auf der Wunschliste</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Bücher filtern und sortieren">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+        <input id="search" type="search" inputmode="search" placeholder="Titel, Band oder Thema suchen …" autocomplete="off" aria-label="Bücher durchsuchen">
+        <button class="clear-search" id="clearSearch" type="button" aria-label="Suche löschen" hidden>&times;</button>
+      </div>
+      <div class="control-row">
+        <button class="filter-btn active" type="button" data-filter="all">Alle</button>
+        <button class="filter-btn" type="button" data-filter="owned">Im Besitz</button>
+        <button class="filter-btn" type="button" data-filter="missing">Nicht im Besitz</button>
+        <button class="filter-btn" type="button" data-filter="read">Gelesen</button>
+        <button class="filter-btn" type="button" data-filter="wishlist">Wunschliste</button>
+        <span class="spacer"></span>
+        <select id="sort" aria-label="Sortierung">
+          <option value="asc">Band 1–63</option>
+          <option value="desc">Band 63–1</option>
+          <option value="title">Titel A–Z</option>
+        </select>
+      </div>
+    </section>
+
+    <div class="result-line">
+      <span id="resultCount">63 Bücher</span>
+      <span id="missingCount">63 fehlen</span>
+    </div>
+
+    <section id="books" aria-live="polite"></section>
+
+    <div class="footer-actions">
+      <button class="utility-btn" id="exportBtn" type="button">Sicherung exportieren</button>
+      <button class="utility-btn" id="jpgExportBtn" type="button">JPG-Druckliste</button>
+      <button class="utility-btn" id="importBtn" type="button">Sicherung laden</button>
+      <input id="importFile" type="file" accept="application/json,.json">
+      <button class="utility-btn danger" id="resetBtn" type="button">Alle Markierungen löschen</button>
+    </div>
+
+    <p class="footnote">Hauptreihe, deutscher Stand September 2026. Titel, Ausgaben und Cover wurden mit der <a href="https://www.loewe-verlag.de/kinderbuecher/marken/das-magische-baumhaus/magisches-baumhaus/" target="_blank" rel="noopener">Reihenübersicht des Loewe Verlags</a> abgeglichen. ISBN-Angaben beziehen sich auf die deutschen Hardcover-Einzelausgaben. Coverabbildungen werden online geladen; die Rechte liegen bei den jeweiligen Rechteinhabern. Junior-Reihe und Sammelbände sind nicht enthalten.</p>
+  </main>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <article class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-art" id="modalIcon" aria-hidden="true">📚</div>
+      <div class="modal-body">
+        <p class="band" id="modalBand"></p>
+        <h2 id="modalTitle"></h2>
+        <p id="modalDescription"></p>
+        <div class="fact-grid">
+          <div class="fact"><small>Autorin</small><strong>Mary Pope Osborne</strong></div>
+          <div class="fact"><small>Empfohlen</small><strong>ab 8 Jahren</strong></div>
+          <div class="fact"><small>Deutsche Ausgabe</small><strong id="modalYear"></strong></div>
+          <div class="fact"><small>ISBN (Hardcover)</small><strong id="modalIsbn"></strong></div>
+          <div class="fact"><small>Verlag</small><strong>Loewe Verlag</strong></div>
+          <div class="fact"><small>Status</small><strong id="modalStatus"></strong></div>
+        </div>
+        <div class="modal-actions">
+          <a href="https://www.loewe-verlag.de/kinderbuecher/marken/das-magische-baumhaus/magisches-baumhaus/" target="_blank" rel="noopener">Zum Verlag</a>
+          <button id="closeModal" type="button">Schließen</button>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script>
+    const YEAR_GROUPS = [
+      [1,4,2000], [5,8,2001], [9,14,2002], [15,18,2003], [19,22,2004],
+      [23,26,2005], [27,30,2006], [31,34,2007], [35,36,2008], [37,38,2009],
+      [39,40,2010], [41,42,2011], [43,44,2012], [45,46,2013], [47,48,2014],
+      [49,50,2015], [51,52,2016], [53,53,2017], [54,54,2018], [55,55,2019],
+      [56,57,2020], [58,59,2021], [60,60,2022], [61,61,2023], [62,62,2024],
+      [63,63,2025]
+    ];
+
+    const ISBNS = [
+      "978-3-7855-3591-2", "978-3-7855-3592-9", "978-3-7855-3753-4", "978-3-7855-3754-1",
+      "978-3-7855-3798-5", "978-3-7855-3799-2", "978-3-7855-4005-3", "978-3-7855-4007-7",
+      "978-3-7855-4185-2", "978-3-7855-4186-9", "978-3-7855-4187-6", "978-3-7855-4188-3",
+      "978-3-7855-4393-1", "978-3-7855-4394-8", "978-3-7855-4620-8", "978-3-7855-4623-9",
+      "978-3-7855-4795-3", "978-3-7855-4798-4", "978-3-7855-4973-5", "978-3-7855-4974-2",
+      "978-3-7855-5171-4", "978-3-7855-5172-1", "978-3-7855-5338-1", "978-3-7855-5339-8",
+      "978-3-7855-5535-4", "978-3-7855-5536-1", "978-3-7855-5694-8", "978-3-7855-5693-1",
+      "978-3-7855-5695-5", "978-3-7855-5696-2", "978-3-7855-4803-5", "978-3-7855-4809-7",
+      "978-3-7855-5974-1", "978-3-7855-5975-8", "978-3-7855-6204-8", "978-3-7855-6301-4",
+      "978-3-7855-6322-9", "978-3-7855-6323-6", "978-3-7855-6875-0", "978-3-7855-7080-7",
+      "978-3-7855-7093-7", "978-3-7855-7116-3", "978-3-7855-7065-4", "978-3-7855-7416-4",
+      "978-3-7855-7662-5", "978-3-7855-7683-0", "978-3-7855-7891-9", "978-3-7855-7892-6",
+      "978-3-7855-7893-3", "978-3-7855-8193-3", "978-3-7855-8295-4", "978-3-7855-8506-1",
+      "978-3-7855-8801-7", "978-3-7432-0209-2", "978-3-7432-0559-8", "978-3-7432-0564-2",
+      "978-3-7432-0795-0", "978-3-7432-0985-5", "978-3-7432-1216-9", "978-3-7432-1522-1",
+      "978-3-7432-1662-4", "978-3-7432-1971-7", "978-3-7432-2303-5"
+    ];
+
+    const COVER_PATHS = [
+      "a5/ce/9f/1751877937/9783785535912", "8c/8d/4c/1751877943/9783785535929",
+      "68/ef/e2/1751877948/9783785537534", "cc/65/12/1751877943/9783785537541",
+      "e8/d6/23/1751877937/9783785537985", "g0/e2/a3/1751877946/9783785537992",
+      "18/f5/58/1751877942/9783785540053", "15/33/80/1751877940/9783785540077",
+      "56/2e/5b/1751877940/9783785541852", "7a/42/2a/1751877942/9783785541869",
+      "2d/52/4b/1751877937/9783785541876", "7a/8f/66/1751877938/9783785541883",
+      "15/c3/65/1751877938/9783785543931", "ec/a5/d9/1751877936/9783785543948",
+      "a8/4b/01/1751877940/9783785546208", "92/71/66/1751877949/9783785546239",
+      "5b/5c/47/1751877940/9783785547953", "45/aa/9d/1751877938/9783785547984",
+      "b2/e0/eb/1751877947/9783785549735", "b8/07/53/1751877940/9783785549742",
+      "43/62/79/1751877940/9783785551714",
+      "https://exlibris.azureedge.net/screenshots/9783/7855/5172/1/67031008_1_2_9783785551721_H.jpg",
+      "df/0d/4f/1751877939/9783785553381", "be/31/de/1751877946/9783785553398",
+      "91/a0/6a/1751877947/9783785555354", "53/c8/c5/1751877944/9783785555361",
+      "33/02/4d/1751877940/9783785556948", "ef/f0/00/1751877945/9783785556931",
+      "d6/8a/27/1751877947/9783785556955", "44/de/6a/1751877945/9783785556962",
+      "95/1f/00/1751877938/9783785548035", "70/37/e9/1751877941/9783785548097",
+      "e5/b5/e9/1751877948/9783785559741", "d8/9c/81/1751877936/9783785559758",
+      "37/d7/46/1751877935/9783785562048", "76/d4/61/1751877942/9783785563014",
+      "3f/dd/da/1751877937/9783785563229", "5c/61/38/1751877947/9783785563236",
+      "9a/b4/fe/1751877939/9783785568750", "54/fa/e2/1751877940/9783785570807",
+      "4c/bb/11/1751877940/9783785570937", "c9/fa/1b/1750770518/9783732010547",
+      "ae/06/ed/1751877948/9783785570654", "b8/2c/fc/1751877936/9783785574164",
+      "60/ac/0d/1751877943/9783785576625", "92/ac/77/1751877945/9783785576830",
+      "9d/6c/54/1751877943/9783785578919", "22/76/2e/1751877941/9783785578926",
+      "9b/25/03/1751877939/9783785578933", "e1/f7/89/1751877947/9783785581933",
+      "42/65/30/1751877942/9783785582954", "db/da/ae/1751877947/9783785585061",
+      "3b/f8/a2/1751877946/9783785588017", "ac/18/3b/1746605704/9783743202092",
+      "15/99/51/1747143124/9783743205598", "da/86/4b/1747143115/9783743205642",
+      "ea/77/a8/1747143107/9783743207950", "45/d0/e8/1747143111/9783743209855",
+      "42/0b/65/1747143127/9783743212169", "4e/df/74/1747143148/9783743215221",
+      "58/48/13/1750770495/9783732020324", "14/30/7c/1753798709/9783732023042",
+      "cf/53/26/1746605702/9783743223035"
+    ];
+
+    function coverUrl(path) {
+      if (path.startsWith("http")) return path;
+      return `https://www.loewe-verlag.de/thumbnail/${path}_400x400.webp`;
+    }
+
+    function germanYear(id) {
+      return YEAR_GROUPS.find(([from, to]) => id >= from && id <= to)?.[2] || "–";
+    }
+
+    const BOOKS = [
+      [1, "Im Tal der Dinosaurier", "Urzeit · Dinosaurier", "🦖"],
+      [2, "Der geheimnisvolle Ritter", "Mittelalter · Ritterburg", "🏰"],
+      [3, "Das Geheimnis der Mumie", "Altes Ägypten · Pyramiden", "𓂀"],
+      [4, "Der Schatz der Piraten", "Piraten · Schatzsuche", "🏴‍☠️"],
+      [5, "Im Land der Samurai", "Japan · Samurai", "🥷"],
+      [6, "Gefahr am Amazonas", "Regenwald · Amazonas", "🦜"],
+      [7, "Im Reich der Mammuts", "Eiszeit · Mammuts", "🦣"],
+      [8, "Abenteuer auf dem Mond", "Weltraum · Mond", "🌕"],
+      [9, "Der Ruf der Delfine", "Meer · Delfine", "🐬"],
+      [10, "Das Rätsel der Geisterstadt", "Wilder Westen · Geisterstadt", "🤠"],
+      [11, "Im Tal der Löwen", "Afrika · Löwen", "🦁"],
+      [12, "Auf den Spuren der Eisbären", "Arktis · Eisbären", "🐻‍❄️"],
+      [13, "Im Schatten des Vulkans", "Pompeji · Vesuv", "🌋"],
+      [14, "Im Land der Drachen", "Altes China · Drachen", "🐉"],
+      [15, "Insel der Wikinger", "Wikinger · Irland", "⛵"],
+      [16, "Auf der Fährte der Indianer", "Nordamerika · Prärie", "🐎"],
+      [17, "Im Reich des Tigers", "Indien · Tiger", "🐅"],
+      [18, "Rettung in der Wildnis", "Australien · Wildnis", "🦘"],
+      [19, "Abenteuer in Olympia", "Antikes Griechenland · Olympia", "🏺"],
+      [20, "Im Auge des Wirbelsturms", "Wirbelsturm · Unwetter", "🌪️"],
+      [21, "Gefahr in der Feuerstadt", "San Francisco · Erdbeben", "🔥"],
+      [22, "Verschollen auf hoher See", "Titanic · Atlantik", "🚢"],
+      [23, "Das Geheimnis des alten Theaters", "England · Shakespeare", "🎭"],
+      [24, "Den Gorillas auf der Spur", "Afrika · Gorillas", "🦍"],
+      [25, "Im Land der ersten Siedler", "Nordamerika · Siedler", "🌽"],
+      [26, "Abenteuer in der Südsee", "Hawaii · Südsee", "🌊"],
+      [27, "Im Auftrag des Roten Ritters", "Camelot · Ritter", "🛡️"],
+      [28, "Das verzauberte Spukschloss", "Spukschloss · Magie", "🏚️"],
+      [29, "Das mächtige Zauberschwert", "Zauberschwert · Merlin", "⚔️"],
+      [30, "Im Bann des Eiszauberers", "Eiszauber · Merlin", "❄️"],
+      [31, "Sturmflut vor Venedig", "Venedig · Sturmflut", "🛶"],
+      [32, "Der gestohlene Wüstenschatz", "Bagdad · Wüste", "🐪"],
+      [33, "Geheimauftrag in Paris", "Paris · Weltausstellung", "🗼"],
+      [34, "Das verwunschene Einhorn", "New York · Einhorn", "🦄"],
+      [35, "Angriff des Wolkendrachen", "China · Drachenmagie", "🐲"],
+      [36, "Der geheime Flug des Leonardo", "Italien · Leonardo da Vinci", "🪽"],
+      [37, "Das Ungeheuer vom Meeresgrund", "Tiefsee · Meereswesen", "🐙"],
+      [38, "Das verborgene Reich der Pinguine", "Antarktis · Pinguine", "🐧"],
+      [39, "Die geheime Macht der Zauberflöte", "Wien · Mozart", "🎼"],
+      [40, "Piratenspuk am Mississippi", "Mississippi · Flusspiraten", "🚤"],
+      [41, "Gefangen im Elfenwald", "Irland · Elfenwelt", "🧚"],
+      [42, "Geister in der Nebelnacht", "New Orleans · Jazz", "🎺"],
+      [43, "Das Gift der Königskobra", "Indien · Königskobra", "🐍"],
+      [44, "Lawinenhunde im Schneesturm", "Alpen · Bernhardiner", "🐕"],
+      [45, "Die Feder der Macht", "Abraham Lincoln · Geschichte", "🪶"],
+      [46, "Pandas in großer Gefahr", "China · Pandas", "🐼"],
+      [47, "Im Bann des schwarzen Hengstes", "Antike · Pferde", "🐴"],
+      [48, "Das Geheimnis des Zauberkünstlers", "New York · Houdini", "🎩"],
+      [49, "Abenteuer im Tal der Könige", "Ägypten · Tal der Könige", "⚱️"],
+      [50, "Das beste Fußballspiel aller Zeiten", "Brasilien · Fußball", "⚽"],
+      [51, "Der König der Mayas", "Maya · Mittelamerika", "🗿"],
+      [52, "Wettlauf der Schlittenhunde", "Alaska · Schlittenhunde", "🛷"],
+      [53, "Das Tor zur Dracheninsel", "Irland · Drachen", "🐉"],
+      [54, "Das große Spiel", "Baseball · Sportgeschichte", "⚾"],
+      [55, "Helden im Hurrikan", "Texas · Hurrikan", "🌀"],
+      [56, "Der römische Spion", "Römisches Reich · Legionäre", "🪖"],
+      [57, "Narwal in großer Gefahr", "Grönland · Narwale", "🐋"],
+      [58, "Das verborgene Reich der Inka", "Peru · Inka", "🦙"],
+      [59, "Rettungsmission im Naturpark", "Kalifornien · Naturpark", "🏞️"],
+      [60, "Die Spur des Schneeleoparden", "Himalaya · Schneeleoparden", "🐆"],
+      [61, "Das Geheimnis der Nashörner", "Afrika · Nashörner", "🦏"],
+      [62, "Notfall auf der Schildkröteninsel", "Galápagos · Schildkröten", "🐢"],
+      [63, "Die letzten Wildpferde", "Mongolei · Wildpferde", "🐎"]
+    ].map(([id, title, topic, icon]) => ({
+      id, title, topic, icon,
+      year: germanYear(id),
+      isbn: ISBNS[id - 1],
+      cover: coverUrl(COVER_PATHS[id - 1])
+    }));
+
+    const STORAGE_KEY = "magisches-baumhaus-sammlung-v1";
+    const savedCollection = loadCollection();
+    const state = {
+      owned: savedCollection.owned,
+      read: savedCollection.read,
+      wishlist: savedCollection.wishlist,
+      filter: "all",
+      search: "",
+      sort: "asc"
+    };
+
+    const booksEl = document.getElementById("books");
+    const searchEl = document.getElementById("search");
+    const clearSearchEl = document.getElementById("clearSearch");
+    const sortEl = document.getElementById("sort");
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const toastEl = document.getElementById("toast");
+    let toastTimer;
+
+    function validSet(values) {
+      return new Set((Array.isArray(values) ? values : []).map(Number).filter(id => Number.isInteger(id) && id >= 1 && id <= BOOKS.length));
+    }
+
+    function loadCollection() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        const owned = Array.isArray(stored) ? stored : stored?.owned;
+        return {
+          owned: validSet(owned),
+          read: validSet(stored?.read),
+          wishlist: validSet(stored?.wishlist)
+        };
+      } catch (_) {
+        return { owned: new Set(), read: new Set(), wishlist: new Set() };
+      }
+    }
+
+    function persist() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        version: 2,
+        owned: [...state.owned].sort((a, b) => a - b),
+        read: [...state.read].sort((a, b) => a - b),
+        wishlist: [...state.wishlist].sort((a, b) => a - b)
+      }));
+    }
+
+    function normalize(value) {
+      return value.toLocaleLowerCase("de").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function filteredBooks() {
+      const query = normalize(state.search.trim());
+      return BOOKS
+        .filter(book => {
+          const owned = state.owned.has(book.id);
+          const filterMatch = state.filter === "all"
+            || (state.filter === "owned" && owned)
+            || (state.filter === "missing" && !owned)
+            || (state.filter === "read" && state.read.has(book.id))
+            || (state.filter === "wishlist" && state.wishlist.has(book.id));
+          const haystack = normalize(`${book.id} band ${book.id} ${book.title} ${book.topic} ${book.year} ${book.isbn}`);
+          return filterMatch && (!query || haystack.includes(query));
+        })
+        .sort((a, b) => {
+          if (state.sort === "desc") return b.id - a.id;
+          if (state.sort === "title") return a.title.localeCompare(b.title, "de");
+          return a.id - b.id;
+        });
+    }
+
+    function render() {
+      const shown = filteredBooks();
+      booksEl.replaceChildren();
+
+      if (!shown.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "Keine passenden Bücher gefunden.";
+        booksEl.append(empty);
+      } else {
+        const fragment = document.createDocumentFragment();
+        shown.forEach(book => fragment.append(createCard(book)));
+        booksEl.append(fragment);
+      }
+
+      const owned = state.owned.size;
+      document.getElementById("ownedCount").textContent = owned;
+      document.getElementById("readCount").textContent = state.read.size;
+      document.getElementById("wishlistCount").textContent = state.wishlist.size;
+      document.getElementById("missingCount").textContent = `${BOOKS.length - owned} fehlen`;
+      document.getElementById("resultCount").textContent = `${shown.length} ${shown.length === 1 ? "Buch" : "Bücher"}`;
+      document.getElementById("progressFill").style.width = `${owned / BOOKS.length * 100}%`;
+      clearSearchEl.hidden = !state.search;
+    }
+
+    function createCard(book) {
+      const owned = state.owned.has(book.id);
+      const wished = state.wishlist.has(book.id);
+      const card = document.createElement("article");
+      card.className = `book-card${owned ? " owned" : ""}${wished ? " wished" : ""}`;
+      card.style.setProperty("--hue", `${(book.id * 31 + 90) % 360}`);
+
+      const cover = document.createElement("div");
+      cover.className = "mini-cover";
+      cover.innerHTML = `<span class="book-icon">${book.icon}</span><span class="cover-no">${book.id}</span>`;
+      const coverImage = document.createElement("img");
+      coverImage.src = book.cover;
+      coverImage.alt = `Cover von ${book.title}`;
+      coverImage.loading = "lazy";
+      coverImage.decoding = "async";
+      coverImage.addEventListener("error", () => coverImage.remove());
+      cover.append(coverImage);
+
+      const copy = document.createElement("div");
+      copy.className = "book-copy";
+      const band = document.createElement("p");
+      band.className = "band";
+      band.textContent = `Band ${book.id}`;
+      const title = document.createElement("h2");
+      title.className = "book-title";
+      title.textContent = book.title;
+      const topic = document.createElement("p");
+      topic.className = "topic";
+      topic.textContent = book.topic;
+      const info = document.createElement("button");
+      info.className = "info-btn";
+      info.type = "button";
+      info.textContent = "Informationen";
+      info.addEventListener("click", () => openModal(book));
+      copy.append(band, title, topic, info);
+
+      const actions = document.createElement("div");
+      actions.className = "status-actions";
+      actions.append(
+        createStatusButton(book, "owned", "✓ Besitz", owned),
+        createStatusButton(book, "read", "✓ Gelesen", state.read.has(book.id)),
+        createStatusButton(book, "wishlist", "♡ Wunschliste", wished)
+      );
+
+      card.append(cover, copy, actions);
+      return card;
+    }
+
+    function createStatusButton(book, status, label, active) {
+      const button = document.createElement("button");
+      button.className = "status-btn";
+      button.type = "button";
+      button.dataset.status = status;
+      button.setAttribute("aria-pressed", String(active));
+      button.setAttribute("aria-label", `${book.title}: ${label.replace(/[✓♡]/g, "").trim()}`);
+      button.textContent = label;
+      button.addEventListener("click", () => toggleStatus(book.id, status));
+      return button;
+    }
+
+    function toggleStatus(id, status) {
+      const collection = state[status];
+      if (collection.has(id)) collection.delete(id);
+      else {
+        collection.add(id);
+        if (status === "owned") state.wishlist.delete(id);
+        if (status === "wishlist") state.owned.delete(id);
+      }
+      persist();
+      render();
+    }
+
+    function openModal(book) {
+      const owned = state.owned.has(book.id);
+      document.getElementById("modalBand").textContent = `Band ${book.id} von ${BOOKS.length}`;
+      document.getElementById("modalTitle").textContent = book.title;
+      const modalArt = document.getElementById("modalIcon");
+      modalArt.textContent = book.icon;
+      const modalCover = document.createElement("img");
+      modalCover.src = book.cover;
+      modalCover.alt = `Cover von ${book.title}`;
+      modalCover.addEventListener("error", () => modalCover.remove());
+      modalArt.append(modalCover);
+      document.getElementById("modalDescription").textContent = `Anne und Philipp erleben in diesem Band ein Zeitreise-Abenteuer rund um ${book.topic.replace(" · ", " und ")}.`;
+      document.getElementById("modalYear").textContent = book.year;
+      document.getElementById("modalIsbn").textContent = book.isbn;
+      const statuses = [
+        owned ? "Im Besitz" : "Nicht im Besitz",
+        state.read.has(book.id) ? "Gelesen" : null,
+        state.wishlist.has(book.id) ? "Wunschliste" : null
+      ].filter(Boolean);
+      document.getElementById("modalStatus").textContent = statuses.join(" · ");
+      modalBackdrop.hidden = false;
+      document.body.style.overflow = "hidden";
+      document.getElementById("closeModal").focus();
+    }
+
+    function closeModal() {
+      modalBackdrop.hidden = true;
+      document.body.style.overflow = "";
+    }
+
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      toastEl.textContent = message;
+      toastEl.hidden = false;
+      toastTimer = setTimeout(() => { toastEl.hidden = true; }, 2500);
+    }
+
+    document.querySelectorAll(".filter-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        state.filter = button.dataset.filter;
+        document.querySelectorAll(".filter-btn").forEach(item => item.classList.toggle("active", item === button));
+        render();
+      });
+    });
+
+    searchEl.addEventListener("input", () => { state.search = searchEl.value; render(); });
+    clearSearchEl.addEventListener("click", () => { searchEl.value = ""; state.search = ""; searchEl.focus(); render(); });
+    sortEl.addEventListener("change", () => { state.sort = sortEl.value; render(); });
+
+    document.getElementById("closeModal").addEventListener("click", closeModal);
+    modalBackdrop.addEventListener("click", event => { if (event.target === modalBackdrop) closeModal(); });
+    document.addEventListener("keydown", event => { if (event.key === "Escape" && !modalBackdrop.hidden) closeModal(); });
+
+    function drawCheckbox(context, centerX, centerY, active, color) {
+      const size = 27;
+      context.lineWidth = 3;
+      context.strokeStyle = active ? color : "#aab5b0";
+      context.fillStyle = active ? color : "#ffffff";
+      context.beginPath();
+      context.roundRect(centerX - size / 2, centerY - size / 2, size, size, 5);
+      context.fill();
+      context.stroke();
+      if (!active) return;
+      context.strokeStyle = "#ffffff";
+      context.lineWidth = 4;
+      context.lineCap = "round";
+      context.lineJoin = "round";
+      context.beginPath();
+      context.moveTo(centerX - 8, centerY);
+      context.lineTo(centerX - 2, centerY + 7);
+      context.lineTo(centerX + 9, centerY - 8);
+      context.stroke();
+    }
+
+    function canvasToJpg(canvas, filename) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob(blob => {
+          if (!blob) return reject(new Error("JPG konnte nicht erstellt werden"));
+          resolve(new File([blob], filename, { type: "image/jpeg" }));
+        }, "image/jpeg", .94);
+      });
+    }
+
+    async function createJpgLists() {
+      const exportBooks = filteredBooks();
+      if (!exportBooks.length) return [];
+      const filterNames = {
+        all: "Alle Bücher",
+        owned: "Im Besitz",
+        missing: "Nicht im Besitz",
+        read: "Gelesen",
+        wishlist: "Wunschliste"
+      };
+      const filterSlugs = {
+        all: "alle-buecher",
+        owned: "im-besitz",
+        missing: "nicht-im-besitz",
+        read: "gelesen",
+        wishlist: "wunschliste"
+      };
+      const selectionName = filterNames[state.filter] || "Auswahl";
+      const filenamePart = filterSlugs[state.filter] || "auswahl";
+      const width = 1414;
+      const height = 2000;
+      const margin = 50;
+      const rowsPerPage = 31;
+      const totalPages = Math.ceil(exportBooks.length / rowsPerPage);
+      const columns = [
+        ["Band", 90], ["Titel", 920], ["Jahr", 144], ["Gelesen", 160]
+      ];
+      const files = [];
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d");
+      for (let page = 0; page < totalPages; page++) {
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, width, height);
+        context.textBaseline = "middle";
+
+        context.fillStyle = "#111b17";
+        context.font = "bold 48px Georgia, serif";
+        context.textAlign = "left";
+        context.fillText(selectionName, margin, 72);
+
+        const headerY = 130;
+        const headerHeight = 54;
+        const rowHeight = 54;
+        let x = margin;
+        context.font = "bold 19px Arial, sans-serif";
+        columns.forEach(([label, columnWidth]) => {
+          context.fillStyle = "#123f35";
+          context.fillRect(x, headerY, columnWidth, headerHeight);
+          context.strokeStyle = "#d9d9d9";
+          context.lineWidth = 2;
+          context.strokeRect(x, headerY, columnWidth, headerHeight);
+          context.fillStyle = "#ffffff";
+          context.textAlign = label === "Titel" ? "left" : "center";
+          context.fillText(label, label === "Titel" ? x + 15 : x + columnWidth / 2, headerY + headerHeight / 2);
+          x += columnWidth;
+        });
+
+        const pageBooks = exportBooks.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
+        pageBooks.forEach((book, rowIndex) => {
+          const y = headerY + headerHeight + rowIndex * rowHeight;
+          context.fillStyle = rowIndex % 2 ? "#f2f7f4" : "#ffffff";
+          context.fillRect(margin, y, width - margin * 2, rowHeight);
+
+          x = margin;
+          columns.forEach(([, columnWidth]) => {
+            context.strokeStyle = "#d9d9d9";
+            context.lineWidth = 2;
+            context.strokeRect(x, y, columnWidth, rowHeight);
+            x += columnWidth;
+          });
+
+          const centerY = y + rowHeight / 2;
+          x = margin;
+          context.fillStyle = "#1f2a26";
+          context.font = "20px Arial, sans-serif";
+          context.textAlign = "center";
+          context.fillText(book.id, x + columns[0][1] / 2, centerY);
+          x += columns[0][1];
+          context.textAlign = "left";
+          context.fillText(book.title, x + 15, centerY);
+          x += columns[1][1];
+          context.textAlign = "center";
+          context.fillText(book.year, x + columns[2][1] / 2, centerY);
+          x += columns[2][1];
+          drawCheckbox(context, x + columns[3][1] / 2, centerY, state.read.has(book.id), "#176b54");
+        });
+
+        context.fillStyle = "#68756f";
+        context.font = "19px Arial, sans-serif";
+        context.textAlign = "right";
+        context.fillText(`Seite ${page + 1} von ${totalPages}`, width - margin, height - 38);
+
+        files.push(await canvasToJpg(canvas, `magisches-baumhaus-${filenamePart}-${page + 1}-von-${totalPages}.jpg`));
+      }
+      return files;
+    }
+
+    function downloadFile(file) {
+      const url = URL.createObjectURL(file);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = file.name;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    }
+
+    document.getElementById("exportBtn").addEventListener("click", async () => {
+      const data = JSON.stringify({
+        app: "Das magische Baumhaus – Sammlung",
+        version: 2,
+        exportedAt: new Date().toISOString(),
+        owned: [...state.owned].sort((a, b) => a - b),
+        read: [...state.read].sort((a, b) => a - b),
+        wishlist: [...state.wishlist].sort((a, b) => a - b)
+      }, null, 2);
+      const backupFile = new File([data], "magisches-baumhaus-sicherung.json", { type: "application/json" });
+      try {
+        if (navigator.share && navigator.canShare?.({ files: [backupFile] })) {
+          await navigator.share({ files: [backupFile], title: "Baumhaus-Sammlung sichern" });
+        } else {
+          downloadFile(backupFile);
+          showToast("Sicherung wurde erstellt.");
+        }
+      } catch (error) {
+        if (error?.name !== "AbortError") showToast("Sicherung konnte nicht erstellt werden.");
+      }
+    });
+
+    document.getElementById("jpgExportBtn").addEventListener("click", async event => {
+      const button = event.currentTarget;
+      const oldLabel = button.textContent;
+      button.disabled = true;
+      button.textContent = "JPG wird erstellt …";
+      try {
+        const files = await createJpgLists();
+        if (!files.length) {
+          showToast("In dieser Ansicht gibt es keine Bücher zum Exportieren.");
+          return;
+        }
+        if (navigator.share && navigator.canShare?.({ files })) {
+          await navigator.share({ files, title: "Magisches Baumhaus Druckliste" });
+        } else {
+          files.forEach((file, index) => setTimeout(() => downloadFile(file), index * 300));
+          showToast("Drei JPG-Seiten wurden erstellt.");
+        }
+      } catch (error) {
+        if (error?.name !== "AbortError") showToast("JPG-Liste konnte nicht erstellt werden.");
+      } finally {
+        button.disabled = false;
+        button.textContent = oldLabel;
+      }
+    });
+
+    const importFile = document.getElementById("importFile");
+    document.getElementById("importBtn").addEventListener("click", () => importFile.click());
+    importFile.addEventListener("change", async () => {
+      const file = importFile.files?.[0];
+      if (!file) return;
+      try {
+        const data = JSON.parse(await file.text());
+        if (!Array.isArray(data.owned)) throw new Error("Ungültige Datei");
+        state.owned = validSet(data.owned);
+        state.read = validSet(data.read);
+        state.wishlist = validSet(data.wishlist);
+        state.owned.forEach(id => state.wishlist.delete(id));
+        persist();
+        render();
+        showToast("Sicherung wurde geladen.");
+      } catch (_) {
+        showToast("Diese Sicherungsdatei ist ungültig.");
+      } finally {
+        importFile.value = "";
+      }
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      if (!state.owned.size && !state.read.size && !state.wishlist.size) return showToast("Es sind noch keine Bücher markiert.");
+      if (confirm("Wirklich Besitz, Lesestand und Wunschliste vollständig löschen?")) {
+        state.owned.clear();
+        state.read.clear();
+        state.wishlist.clear();
+        persist();
+        render();
+        showToast("Alle Markierungen wurden gelöscht.");
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
