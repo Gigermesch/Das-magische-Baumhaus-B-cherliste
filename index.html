@@ -417,10 +417,12 @@
 
     .modal-body { padding: 20px; }
     .modal-body h2 { margin: 4px 0 10px; font: 700 1.7rem/1.1 Georgia, "Times New Roman", serif; }
+    .modal-body .synopsis-title { margin: 18px 0 6px; color: var(--forest); font-size: .78rem; letter-spacing: .09em; text-transform: uppercase; }
     .modal-body p { margin: 0 0 14px; }
 
     .fact-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 18px 0; }
     .fact { padding: 11px; border: 1px solid var(--line); border-radius: 12px; background: white; }
+    .fact.wide { grid-column: 1 / -1; }
     .fact small { display: block; color: var(--muted); font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
     .fact strong { display: block; margin-top: 2px; }
 
@@ -532,8 +534,10 @@
       <div class="modal-body">
         <p class="band" id="modalBand"></p>
         <h2 id="modalTitle"></h2>
+        <h3 class="synopsis-title">Darum geht es</h3>
         <p id="modalDescription"></p>
         <div class="fact-grid">
+          <div class="fact wide"><small>Schauplatz &amp; Thema</small><strong id="modalTopic"></strong></div>
           <div class="fact"><small>Autorin</small><strong>Mary Pope Osborne</strong></div>
           <div class="fact"><small>Empfohlen</small><strong>ab 8 Jahren</strong></div>
           <div class="fact"><small>Deutsche Ausgabe</small><strong id="modalYear"></strong></div>
@@ -625,6 +629,72 @@
       return YEAR_GROUPS.find(([from, to]) => id >= from && id <= to)?.[2] || "–";
     }
 
+    const SUMMARIES = [
+      "Anne und Philipp entdecken im Wald ein geheimnisvolles Baumhaus voller Bücher. Als es sich plötzlich dreht, landen sie in der Urzeit – mitten zwischen Dinosauriern.",
+      "Das Baumhaus bringt Anne und Philipp zu einer Burg im Mittelalter. Dort folgen sie der Spur eines geheimnisvollen Ritters und geraten hinter den Mauern in ein gefährliches Abenteuer.",
+      "Anne und Philipp reisen ins alte Ägypten und beobachten eine Menschenmenge vor einer Pyramide. Im Inneren wollen sie das Rätsel einer Mumie lösen.",
+      "Eine tropische Insel wirkt zunächst wie ein Paradies. Doch dann taucht ein Schiff mit schwarzer Flagge auf, und Anne und Philipp geraten zwischen Piraten und ihre Schatzsuche.",
+      "Im alten Japan treffen Anne und Philipp auf geheimnisvolle Ninjas, die sie durch Wälder, über Flüsse und zu einer Höhle führen. Als Samurai auftauchen, wird die Reise gefährlich.",
+      "Im Amazonas-Regenwald begegnen Anne und Philipp riesigen Bäumen, giftigen Tieren und gefährlichen Flüssen. Auf der Flucht vor Ameisen, Spinnen, Piranhas und Krokodilen stoßen sie auf ein neues Geheimnis.",
+      "Das Baumhaus landet in einer eisigen Landschaft der Steinzeit. Höhlenzeichnungen führen Anne und Philipp auf die Spur von Mammuts und mitten in ein Abenteuer der Eiszeit.",
+      "Bei einer nächtlichen Reise fliegt das Baumhaus weiter als je zuvor: bis zum Mond. Anne und Philipp erkunden die fremde Landschaft und erleben ihren ersten Spaziergang im Weltraum.",
+      "In der Südsee erkunden Anne und Philipp mit einem Mini-U-Boot die Unterwasserwelt. Als sie in Gefahr geraten, könnten zwei Delfine ihre einzige Rettung sein.",
+      "Anne und Philipp landen in einer verlassenen Stadt im Wilden Westen. Gemeinsam mit dem Cowboy Slim versuchen sie, eine Herde wilder Mustangs einzufangen.",
+      "Mitten in der afrikanischen Savanne verliert Philipp seine Schwester aus den Augen. Auf der Suche nach Anne kommen die Geschwister den Löwen gefährlich nahe.",
+      "In der verschneiten Arktis begegnen Anne und Philipp zwei Eisbärenkindern. Als sie selbst im Eis festsitzen, erhalten sie unerwartete Hilfe auf vier Pfoten.",
+      "Das Baumhaus bringt Anne und Philipp nach Pompeji. Eine Wahrsagerin warnt sie in Rätseln – kurz bevor der Vesuv die Stadt in große Gefahr bringt.",
+      "Im alten China geraten Anne und Philipp in das Reich eines mächtigen Kaisers. Um ihm zu entkommen, beginnt ein Wettlauf gegen die Zeit.",
+      "Auf einer irischen Insel suchen Anne und Philipp in einem Kloster nach einem wertvollen Buch. Dann nähert sich ein Wikingerschiff und bedroht die Bewohner.",
+      "In der nordamerikanischen Prärie treffen Anne und Philipp den Jungen Schwarzer Falke. Gemeinsam geraten sie in den Weg einer heranstürmenden Büffelherde.",
+      "Anne und Philipp erkunden den indischen Dschungel voller Affen, Elefanten und bunter Vögel. Dann tauchen im Dickicht die funkelnden Augen eines Tigers auf.",
+      "Im australischen Busch begegnen Anne und Philipp Koalas und Kängurus. Als Dingos ein Kängurubaby bedrohen, versuchen die Geschwister es zu retten.",
+      "Das Baumhaus bringt Anne und Philipp zu den Olympischen Spielen im alten Griechenland. Weil Mädchen dort ausgeschlossen sind, bringt Annes heimlicher Besuch eines Wagenrennens beide in Schwierigkeiten.",
+      "In der amerikanischen Prärie besuchen Anne und Philipp eine kleine Schule. Als ein Tornado direkt auf das Gebäude zurast, müssen sie die Kinder schnell in Sicherheit bringen.",
+      "Anne und Philipp landen 1906 in San Francisco. Als ein schweres Erdbeben die Stadt erschüttert und Feuer ausbrechen, suchen sie verzweifelt den Weg zurück zum Baumhaus.",
+      "Mitten in der Nacht landen Anne und Philipp auf der Titanic. Nach dem Zusammenstoß mit einem Eisberg beginnt das Schiff zu sinken und für die Geschwister ein Wettlauf gegen die Zeit.",
+      "Im England Shakespeares springen Anne und Philipp für zwei fehlende Schauspieler ein. Das ist besonders riskant, weil Mädchen damals nicht auf der Theaterbühne auftreten dürfen.",
+      "Im afrikanischen Regenwald schließen Anne und Philipp Freundschaft mit einer Gorilla-Familie. Als ein Leopard auftaucht, müssen sie die jungen Gorillas beschützen.",
+      "Anne und Philipp besuchen die ersten englischen Siedler in Nordamerika, die nach einem harten Winter ein Fest vorbereiten. Beim Helfen unterläuft Philipp ein folgenschweres Missgeschick.",
+      "Auf Hawaii lernen Anne und Philipp das Leben der Inselbewohner kennen und gehen surfen. Nach einem Erdbeben rast plötzlich eine gewaltige Flutwelle auf die Küste zu.",
+      "Das verfluchte Camelot ist in Gefahr. Der Rote Ritter schickt Anne und Philipp in die magische Anderswelt, damit sie Hilfe für König Artus und seine Ritter holen.",
+      "Die Kinder einer Burg wurden in Geister verwandelt. Anne und Philipp müssen den Rabenkönig besiegen und den gestohlenen Schicksalsdiamanten zurückholen, um den Fluch zu brechen.",
+      "Merlin beauftragt Anne und Philipp, das spätere Schwert von König Artus zu finden. Ein böser Eiszauberer hat es gestohlen und bewacht es in einer gefährlichen Zauberwelt.",
+      "Im Land des Ewigen Schnees hält der Eiszauberer Merlin und Morgan gefangen. Anne und Philipp können sie nur befreien, wenn sie seine schwierige Aufgabe lösen.",
+      "Anne und Philipp reisen in das überflutete Venedig. Im Auftrag Merlins sollen sie die geheimnisvolle ‚Dame der Lagune‘ retten und herausfinden, welche Gefahr der Stadt droht.",
+      "Nach einer Landung in der Wüste suchen Anne und Philipp den Kalifen von Bagdad. Sie sollen ihm helfen, Weisheit in die Welt zu tragen, und geraten dabei in ein rätselhaftes Abenteuer.",
+      "Auf der Pariser Weltausstellung sollen Anne und Philipp vier außergewöhnliche Erfinder und Künstler finden. Ein böser Magier sucht ebenfalls nach ihnen und kommt den Geschwistern zuvor.",
+      "Mitten in New York ist ein Einhorn durch einen Zauber gefangen. Anne und Philipp finden es in einem Museum, doch zwei Verfolger wollen das magische Tier entführen.",
+      "Im alten Japan suchen Anne und Philipp nach dem Geheimnis des Glücks und treffen den Dichter Bashō. Als in Edo ein Feuer ausbricht, hoffen sie auf die Hilfe des Wolkendrachen.",
+      "Anne und Philipp verbringen einen Tag mit Leonardo da Vinci und sehen seine Pläne für eine Flugmaschine. Gemeinsam versuchen sie, seinen großen Traum vom Fliegen wahr werden zu lassen.",
+      "Auf einem Forschungsschiff des 19. Jahrhunderts erleben Anne und Philipp die Erforschung der Tiefsee. In einem Sturm werden sie von einem unbekannten Meereswesen in die Tiefe gezogen.",
+      "In der Antarktis schließen sich Anne und Philipp einer Expedition zu einem Eisvulkan an. Nach einem Sturz in eine Gletscherspalte treiben sie auf einer Eisscholle einem verborgenen Reich entgegen.",
+      "Im Österreich des 18. Jahrhunderts sollen Anne und Philipp einen begabten jungen Künstler finden. Als wilde Tiere den Schlosspark überrennen, müssen sie dem jungen Mozart helfen.",
+      "In New Orleans suchen Anne und Philipp den jungen Louis Armstrong und wollen ihm die Freude am Trompetespielen zurückgeben. Nachts werden sie in einer alten Schmiede eingeschlossen und hören geisterhafte Stimmen.",
+      "Im stürmischen Irland sollen Anne und Philipp die Fantasie eines Mädchens namens Augusta wecken. Durch ein falsch gesungenes Flötenlied wird sie jedoch in das Reich der Elfen verschleppt.",
+      "Im viktorianischen London sollen Anne und Philipp dem berühmten Schriftsteller Charles Dickens helfen. Erst eine unheimliche Begegnung zeigt ihnen, von welchen inneren Geistern er gequält wird.",
+      "Als angebliche Botschafter suchen Anne und Philipp im Palast eines indischen Großmoguls nach einer Smaragdrose. Eine schwierige Prüfung und eine giftige Königskobra stehen ihnen im Weg.",
+      "In den Schweizer Alpen treffen Anne und Philipp Mönche und ihre Lawinenhunde. Als der junge Bernhardiner Barry im Schneesturm verschwindet, starten sie eine gefährliche Rettungsaktion.",
+      "Im Garten von Abraham Lincoln sollen Anne und Philipp eine magische Feder erhalten. Als der Junge Sam schwer verletzt wird, müssen sie ihn retten, bevor die Zeit abläuft.",
+      "In einer chinesischen Panda-Aufzuchtstation suchen Anne und Philipp einen magischen Gegenstand. Nach einem Erdbeben verschwinden mehrere Pandas und die Geschwister eilen ihnen zu Hilfe.",
+      "Im alten Mazedonien treffen Anne und Philipp auf den jungen Alexander und seinen Hengst Bukephalos. Dabei wollen sie herausfinden, was wahre Größe wirklich bedeutet.",
+      "Das Baumhaus bringt Anne und Philipp in einen New Yorker Vergnügungspark. Dort sollen sie Harry Houdini treffen, doch die Vorstellung des berühmten Entfesselungskünstlers ist ausverkauft.",
+      "In Ägypten begleiten Anne und Philipp Florence Nightingale bis ins Tal der Könige. Mit einem kleinen Affen an ihrer Seite müssen sie wilden Schakalen entkommen.",
+      "Anne und Philipp besuchen die Fußball-Weltmeisterschaft 1970 in Mexiko und suchen Pelé. Im riesigen Stadion hoffen sie, von ihm das Geheimnis wahrer Größe zu erfahren.",
+      "Ein vermeintlicher Erholungsurlaub führt Anne und Philipp in die Zeit der alten Maya. Als sie dem König begegnen, hat dieser ganz eigene Pläne für die Geschwister.",
+      "Im Alaska des Jahres 1925 fehlen während einer Epidemie lebenswichtige Medikamente. Anne und Philipp machen sich mit einem Hundeschlitten auf den Weg durch den Schneesturm.",
+      "König Artus ist verletzt und kann nur auf Avalon geheilt werden. Anne und Philipp müssen die gestohlene Drachenstatue finden, die das Tor zur Insel öffnet.",
+      "Mit verzauberten Baseballkappen reisen Anne und Philipp nach New York ins Jahr 1947 und werden Teil eines historischen Spiels. Als Philipp seine Kappe verliert, gerät die Mission in Gefahr.",
+      "Ein Hurrikan überschwemmt im Jahr 1900 die texanische Stadt Galveston. Anne und Philipp helfen den Menschen, bis die Fluten auch sie selbst mitreißen.",
+      "Vor einem römischen Feldlager treffen Anne und Philipp auf einen geheimnisvollen Reiter. Weil er als Spion gilt, werden auch die Geschwister verdächtigt und dem Kaiser vorgeführt.",
+      "In Grönland beobachten Anne und Philipp Narwale zwischen riesigen Eisbergen. Ein Jungtier wird von seiner Familie getrennt und zugleich von Orcas und einem jungen Wikinger bedroht.",
+      "In den peruanischen Anden wird ein Lama-Baby gestohlen. Die Suche führt Anne und Philipp über Hängebrücken und Bergpässe bis nach Machu Picchu.",
+      "Im Jahr 1903 erkunden Anne und Philipp das Yosemite-Tal in Kalifornien. Als die Landschaft und ihre Tiere bedroht werden, versuchen sie das Naturparadies zu schützen.",
+      "Am Fuß des Himalaja sollen Anne und Philipp das Geheimnis des ‚Grauen Geistes‘ lösen. Ein seltener Schneeleopard erscheint und verschwindet rätselhaft wieder.",
+      "In einem Wildreservat im südlichen Afrika jagen Wilderer eine Nashornmutter. Anne und Philipp müssen sie zuerst finden und gemeinsam mit ihrem Baby schützen.",
+      "Auf den Galápagosinseln bricht ein Vulkan aus. Anne und Philipp beteiligen sich an einer riskanten Rettungsaktion für die bedrohten Riesenschildkröten.",
+      "In der Mongolei helfen Anne und Philipp bei der Auswilderung seltener Przewalski-Pferde. Als Tiere aus ihrer Koppel fliehen, müssen sie diese vor hungrigen Wölfen finden."
+    ];
+
     const BOOKS = [
       [1, "Im Tal der Dinosaurier", "Urzeit · Dinosaurier", "🦖"],
       [2, "Der geheimnisvolle Ritter", "Mittelalter · Ritterburg", "🏰"],
@@ -660,22 +730,22 @@
       [32, "Der gestohlene Wüstenschatz", "Bagdad · Wüste", "🐪"],
       [33, "Geheimauftrag in Paris", "Paris · Weltausstellung", "🗼"],
       [34, "Das verwunschene Einhorn", "New York · Einhorn", "🦄"],
-      [35, "Angriff des Wolkendrachen", "China · Drachenmagie", "🐲"],
+      [35, "Angriff des Wolkendrachen", "Japan · Edo · Wolkendrache", "🐲"],
       [36, "Der geheime Flug des Leonardo", "Italien · Leonardo da Vinci", "🪽"],
       [37, "Das Ungeheuer vom Meeresgrund", "Tiefsee · Meereswesen", "🐙"],
       [38, "Das verborgene Reich der Pinguine", "Antarktis · Pinguine", "🐧"],
       [39, "Die geheime Macht der Zauberflöte", "Wien · Mozart", "🎼"],
-      [40, "Piratenspuk am Mississippi", "Mississippi · Flusspiraten", "🚤"],
+      [40, "Piratenspuk am Mississippi", "New Orleans · Louis Armstrong", "🚤"],
       [41, "Gefangen im Elfenwald", "Irland · Elfenwelt", "🧚"],
-      [42, "Geister in der Nebelnacht", "New Orleans · Jazz", "🎺"],
+      [42, "Geister in der Nebelnacht", "London · Charles Dickens", "🎺"],
       [43, "Das Gift der Königskobra", "Indien · Königskobra", "🐍"],
       [44, "Lawinenhunde im Schneesturm", "Alpen · Bernhardiner", "🐕"],
       [45, "Die Feder der Macht", "Abraham Lincoln · Geschichte", "🪶"],
       [46, "Pandas in großer Gefahr", "China · Pandas", "🐼"],
-      [47, "Im Bann des schwarzen Hengstes", "Antike · Pferde", "🐴"],
+      [47, "Im Bann des schwarzen Hengstes", "Mazedonien · Alexander der Große", "🐴"],
       [48, "Das Geheimnis des Zauberkünstlers", "New York · Houdini", "🎩"],
       [49, "Abenteuer im Tal der Könige", "Ägypten · Tal der Könige", "⚱️"],
-      [50, "Das beste Fußballspiel aller Zeiten", "Brasilien · Fußball", "⚽"],
+      [50, "Das beste Fußballspiel aller Zeiten", "Mexiko · Fußball-WM 1970", "⚽"],
       [51, "Der König der Mayas", "Maya · Mittelamerika", "🗿"],
       [52, "Wettlauf der Schlittenhunde", "Alaska · Schlittenhunde", "🛷"],
       [53, "Das Tor zur Dracheninsel", "Irland · Drachen", "🐉"],
@@ -691,6 +761,7 @@
       [63, "Die letzten Wildpferde", "Mongolei · Wildpferde", "🐎"]
     ].map(([id, title, topic, icon]) => ({
       id, title, topic, icon,
+      summary: SUMMARIES[id - 1],
       year: germanYear(id),
       isbn: ISBNS[id - 1],
       cover: coverUrl(COVER_PATHS[id - 1])
@@ -756,7 +827,7 @@
             || (state.filter === "missing" && !owned)
             || (state.filter === "read" && state.read.has(book.id))
             || (state.filter === "wishlist" && state.wishlist.has(book.id));
-          const haystack = normalize(`${book.id} band ${book.id} ${book.title} ${book.topic} ${book.year} ${book.isbn}`);
+          const haystack = normalize(`${book.id} band ${book.id} ${book.title} ${book.topic} ${book.summary} ${book.year} ${book.isbn}`);
           return filterMatch && (!query || haystack.includes(query));
         })
         .sort((a, b) => {
@@ -874,7 +945,8 @@
       modalCover.alt = `Cover von ${book.title}`;
       modalCover.addEventListener("error", () => modalCover.remove());
       modalArt.append(modalCover);
-      document.getElementById("modalDescription").textContent = `Anne und Philipp erleben in diesem Band ein Zeitreise-Abenteuer rund um ${book.topic.replace(" · ", " und ")}.`;
+      document.getElementById("modalDescription").textContent = book.summary;
+      document.getElementById("modalTopic").textContent = book.topic;
       document.getElementById("modalYear").textContent = book.year;
       document.getElementById("modalIsbn").textContent = book.isbn;
       const statuses = [
