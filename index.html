@@ -152,6 +152,11 @@
       -webkit-backdrop-filter: blur(14px);
     }
 
+    .series-tabs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 12px; scrollbar-width: none; }
+    .series-tabs::-webkit-scrollbar { display: none; }
+    .series-btn { flex: 0 0 auto; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: white; font-weight: 800; cursor: pointer; }
+    .series-btn.active { color: white; background: var(--forest); border-color: var(--forest); }
+    .series-btn small { opacity: .75; font-size: .75em; }
     .search-wrap { position: relative; }
 
     .search-wrap svg {
@@ -286,6 +291,9 @@
     .band { margin: 0 0 2px; color: var(--forest-2); font-size: .76rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
     .book-title { margin: 0; font: 700 1.06rem/1.18 Georgia, "Times New Roman", serif; }
     .topic { margin: 5px 0 8px; color: var(--muted); font-size: .84rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .edition-state { margin: 7px 0 5px; padding: 5px 8px; border-radius: 8px; color: var(--forest); background: var(--owned); font-size: .76rem; font-weight: 800; line-height: 1.35; }
+    .edition-state + .edition-state { margin-top: 4px; }
+    .edition-state.wishlist { color: #913f3a; background: #faece8; }
 
     .info-btn {
       margin: 0;
@@ -440,6 +448,26 @@
     .modal-actions a { color: white; background: var(--forest); }
     .modal-actions button { color: var(--forest); background: transparent; }
 
+    .edition-picker { padding: 22px; }
+    .edition-picker h2 { margin: 2px 0 5px; font: 700 1.45rem/1.15 Georgia, "Times New Roman", serif; }
+    .edition-picker > p { margin: 0 0 15px; color: var(--muted); }
+    .edition-options { display: grid; gap: 9px; }
+    .edition-option {
+      display: block;
+      width: 100%;
+      min-height: 62px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: white;
+      text-align: left;
+      cursor: pointer;
+    }
+    .edition-option[aria-pressed="true"] { border-color: var(--forest-2); background: var(--owned); }
+    .edition-option strong, .edition-option small { display: block; }
+    .edition-option small { margin-top: 2px; color: var(--muted); }
+    .edition-cancel { margin-top: 14px; padding: 8px 0; border: 0; background: transparent; color: var(--forest); font-weight: 800; cursor: pointer; }
+
     .toast {
       position: fixed;
       z-index: 70;
@@ -476,10 +504,10 @@
     <div class="hero-inner">
       <p class="eyebrow">Meine Büchersammlung</p>
       <h1>Das magische Baumhaus</h1>
-      <p class="hero-copy">Behalte Besitz, Lesestand und Wunschliste für alle 63 Bände im Blick. Deine Auswahl bleibt auf diesem Gerät gespeichert.</p>
+      <p class="hero-copy">Behalte Hauptreihe, Junior und Forscherhandbücher im Blick. Deine Auswahl bleibt auf diesem Gerät gespeichert.</p>
       <div class="progress-row" aria-label="Sammlungsfortschritt">
         <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-        <div class="progress-count"><span id="ownedCount">0</span> von 63</div>
+        <div class="progress-count"><span id="ownedCount">0</span> von <span id="totalCount">121</span></div>
       </div>
       <div class="collection-stats">
         <span><b id="readCount">0</b> gelesen</span>
@@ -489,6 +517,12 @@
   </header>
 
   <main>
+    <nav class="series-tabs" aria-label="Buchreihe wählen">
+      <button class="series-btn active" type="button" data-series="all">Alle Reihen <small>121</small></button>
+      <button class="series-btn" type="button" data-series="main">Hauptreihe <small>63</small></button>
+      <button class="series-btn" type="button" data-series="junior">Junior <small>43</small></button>
+      <button class="series-btn" type="button" data-series="research">Forscherhandbücher <small>15</small></button>
+    </nav>
     <section class="controls" aria-label="Bücher filtern und sortieren">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
@@ -503,16 +537,16 @@
         <button class="filter-btn" type="button" data-filter="wishlist">Wunschliste</button>
         <span class="spacer"></span>
         <select id="sort" aria-label="Sortierung">
-          <option value="asc">Band 1–63</option>
-          <option value="desc">Band 63–1</option>
+          <option value="asc">Band aufsteigend</option>
+          <option value="desc">Band absteigend</option>
           <option value="title">Titel A–Z</option>
         </select>
       </div>
     </section>
 
     <div class="result-line">
-      <span id="resultCount">63 Bücher</span>
-      <span id="missingCount">63 fehlen</span>
+      <span id="resultCount">121 Bücher</span>
+      <span id="missingCount">121 fehlen</span>
     </div>
 
     <section id="books" aria-live="polite"></section>
@@ -525,7 +559,7 @@
       <button class="utility-btn danger" id="resetBtn" type="button">Alle Markierungen löschen</button>
     </div>
 
-    <p class="footnote">Hauptreihe, deutscher Stand September 2026. Titel, Ausgaben und Cover wurden mit der <a href="https://www.loewe-verlag.de/kinderbuecher/marken/das-magische-baumhaus/magisches-baumhaus/" target="_blank" rel="noopener">Reihenübersicht des Loewe Verlags</a> abgeglichen. ISBN-Angaben beziehen sich auf die deutschen Hardcover-Einzelausgaben. Coverabbildungen werden online geladen; die Rechte liegen bei den jeweiligen Rechteinhabern. Junior-Reihe und Sammelbände sind nicht enthalten.</p>
+    <p class="footnote">Stand September 2026. <a href="https://www.loewe-verlag.de/kinderbuecher/marken/das-magische-baumhaus/magisches-baumhaus/" target="_blank" rel="noopener">Hauptreihe</a> und <a href="https://www.loewe-verlag.de/kinderbuecher/marken/das-magische-baumhaus/magisches-baumhaus-junior/" target="_blank" rel="noopener">Junior</a> nach Loewe; ältere Forscherhandbücher mit der <a href="https://antolin.westermann.de/booksearch.do?series=1938" target="_blank" rel="noopener">Antolin-Reihenliste</a> abgeglichen. „Zu Band“ bei Forscherhandbüchern meint den passenden Hauptband. Ein Strich beim Jahr bedeutet: für diese Ausgabe nicht geprüft. Cover werden online geladen; falls eine Bildquelle ausfällt, wird eine andere versucht. Sicherung enthält alle Reihen; JPG zeigt die aktuelle Auswahl.</p>
   </main>
 
   <div class="modal-backdrop" id="modalBackdrop" hidden>
@@ -539,17 +573,30 @@
         <div class="fact-grid">
           <div class="fact wide"><small>Schauplatz &amp; Thema</small><strong id="modalTopic"></strong></div>
           <div class="fact"><small>Autorin</small><strong>Mary Pope Osborne</strong></div>
-          <div class="fact"><small>Empfohlen</small><strong>ab 8 Jahren</strong></div>
-          <div class="fact"><small>Deutsche Ausgabe</small><strong id="modalYear"></strong></div>
-          <div class="fact"><small>ISBN (Hardcover)</small><strong id="modalIsbn"></strong></div>
+          <div class="fact"><small>Empfohlen</small><strong id="modalAge">ab 8 Jahren</strong></div>
+          <div class="fact"><small>Ausgabejahr (wenn geprüft)</small><strong id="modalYear"></strong></div>
+          <div class="fact"><small>ISBN (wenn geprüft)</small><strong id="modalIsbn"></strong></div>
           <div class="fact"><small>Verlag</small><strong>Loewe Verlag</strong></div>
           <div class="fact"><small>Status</small><strong id="modalStatus"></strong></div>
+          <div class="fact wide" id="modalOwnedEditionFact" hidden><small>Ausgabe im Besitz</small><strong id="modalOwnedEdition"></strong></div>
+          <div class="fact wide" id="modalReadEditionFact" hidden><small>Gelesene Ausgabe</small><strong id="modalReadEdition"></strong></div>
+          <div class="fact wide" id="modalWishlistEditionFact" hidden><small>Ausgabe auf der Wunschliste</small><strong id="modalWishlistEdition"></strong></div>
         </div>
         <div class="modal-actions">
-          <a href="https://www.loewe-verlag.de/kinderbuecher/marken/das-magische-baumhaus/magisches-baumhaus/" target="_blank" rel="noopener">Zum Verlag</a>
+          <a id="modalPublisherLink" href="https://www.loewe-verlag.de/kinderbuecher/marken/das-magische-baumhaus/magisches-baumhaus/" target="_blank" rel="noopener">Zum Verlag</a>
           <button id="closeModal" type="button">Schließen</button>
         </div>
       </div>
+    </article>
+  </div>
+
+  <div class="modal-backdrop" id="editionBackdrop" hidden>
+    <article class="modal edition-picker" role="dialog" aria-modal="true" aria-labelledby="editionTitle">
+      <p class="band" id="editionBook"></p>
+      <h2 id="editionTitle"></h2>
+      <p>Welche Ausgabe meinst du?</p>
+      <div class="edition-options" id="editionOptions"></div>
+      <button class="edition-cancel" id="editionCancel" type="button">Abbrechen</button>
     </article>
   </div>
 
@@ -767,6 +814,79 @@
       cover: coverUrl(COVER_PATHS[id - 1])
     }));
 
+
+    // Die beiden ergänzten Reihen verwenden eigene Schlüssel. Unbelegte Ausgabendaten bleiben leer.
+    const JUNIOR_COVERS = ["https://www.loewe-verlag.de/media/95/67/32/1787702409/9783785581964.webp?ts=1787702409","https://www.loewe-verlag.de/media/38/32/65/1751877940/9783785582343.webp?ts=1751878270","https://www.loewe-verlag.de/media/94/0b/9f/1751877948/9783785582817.webp?ts=1751878270","https://www.loewe-verlag.de/media/67/7b/e8/1751877944/9783785582947.webp?ts=1751878270","https://www.loewe-verlag.de/media/15/4f/f9/1751877945/9783785583142.webp?ts=1751878270","https://www.loewe-verlag.de/media/bd/be/e9/1751877948/9783785583159.webp?ts=1751878270","https://www.loewe-verlag.de/media/d8/82/e1/1751877945/9783785583166.webp?ts=1751878275","https://www.loewe-verlag.de/media/45/64/a6/1751877937/9783785583173.webp?ts=1751878275","https://www.loewe-verlag.de/media/a3/87/d9/1751877941/9783785587577.webp?ts=1751878277","https://www.loewe-verlag.de/media/ac/6b/3c/1751877938/9783785587584.webp?ts=1751878277","https://www.loewe-verlag.de/media/e1/d9/13/1751877947/9783785587607.webp?ts=1751878292","https://www.loewe-verlag.de/media/b2/87/22/1751877944/9783785587614.webp?ts=1751878295","https://www.loewe-verlag.de/media/d9/35/c4/1751877940/9783785589366.webp?ts=1751878295","https://www.loewe-verlag.de/media/1c/2d/02/1751877947/9783785589373.webp?ts=1751878295","https://www.loewe-verlag.de/media/cd/ae/df/1787702411/9783785589380.webp?ts=1787702411","https://www.loewe-verlag.de/media/49/d3/f7/1751877946/9783785589397.webp?ts=1751878295","https://www.loewe-verlag.de/media/4c/fb/6c/1746605715/9783743202870.webp?ts=1746606055","https://www.loewe-verlag.de/media/04/bb/b5/1746605705/9783743202887.webp?ts=1746606055","https://www.loewe-verlag.de/media/07/a5/7a/1746605710/9783743203495.webp?ts=1746606056","https://www.loewe-verlag.de/media/f2/46/97/1747143144/9783743205635.webp?ts=1747143426","","https://www.loewe-verlag.de/media/28/18/ef/1747143126/9783743206281.webp?ts=1747143426","","https://www.loewe-verlag.de/media/13/90/fd/1747143108/9783743207660.webp?ts=1747143430","https://www.loewe-verlag.de/media/2a/22/fd/1747143122/9783743209589.webp?ts=1747143437","https://www.loewe-verlag.de/media/6b/a7/b7/1747143114/9783743209596.webp?ts=1747143437","https://www.loewe-verlag.de/media/68/ba/af/1747143118/9783743209602.webp?ts=1747143437","https://www.loewe-verlag.de/media/a4/b4/ec/1747143115/9783743209619.webp?ts=1747143437","https://www.loewe-verlag.de/media/eb/f9/ca/1747143111/9783743212220.webp?ts=1747143453","https://www.loewe-verlag.de/media/dc/93/12/1747143152/9783743212770.webp?ts=1747143459","https://www.loewe-verlag.de/media/f5/01/bb/1747143133/9783743212787.webp?ts=1747143459","https://www.loewe-verlag.de/media/67/03/db/1747143101/9783743212794.webp?ts=1747143461","https://www.loewe-verlag.de/media/e1/33/18/1747143139/9783743212800.webp?ts=1747143461","https://www.loewe-verlag.de/media/6c/4c/1b/1747143123/9783743216631.webp?ts=1747143473","https://www.loewe-verlag.de/media/7f/55/23/1747143147/9783743216648.webp?ts=1747143473","https://www.loewe-verlag.de/media/24/4d/97/1747143101/9783743216655.webp?ts=1747143477","https://www.loewe-verlag.de/media/a7/94/ee/1747143136/9783743216662.webp?ts=1747143477","https://www.loewe-verlag.de/media/dd/3d/95/1747143117/9783743219458.webp?ts=1747143479","https://www.loewe-verlag.de/media/d4/57/b5/1747143134/9783743219465.webp?ts=1747143479","https://www.loewe-verlag.de/media/6a/ba/e3/1747143111/9783743219472.webp?ts=1747143488","https://www.loewe-verlag.de/media/6f/1d/74/1747143144/9783743219489.webp?ts=1747143488","https://www.loewe-verlag.de/media/89/58/b1/1746605718/9783743223011.webp?ts=1751014151","https://www.loewe-verlag.de/media/07/ce/ee/1763427607/9783743223028.webp?ts=1763444452"];
+    const RESEARCH_ISBNS = ["9783785545096","9783785545089","9783785566725","9783785557914","9783785560570","9783785557945","9783785557938","9783785564363","9783785556917","9783785561850","9783785548448","9783785567555","9783785566367","9783785569238","9783785566992"];
+    const JUNIOR = [{"id": 1, "title": "Abenteuer bei den Dinosauriern", "isbn": "—"}, {"id": 2, "title": "Auf der Spur der Ritter", "isbn": "9783785582343"}, {"id": 3, "title": "Die rätselhafte Mumie", "isbn": "9783785582817"}, {"id": 4, "title": "Suche nach dem Piratenschatz", "isbn": "9783785582947"}, {"id": 5, "title": "Das Geheimnis der Ninjas", "isbn": "9783785583142"}, {"id": 6, "title": "Verborgen im Dschungel", "isbn": "9783785583159"}, {"id": 7, "title": "Gefahr für das Mammut", "isbn": "9783785583166"}, {"id": 8, "title": "Die verlassene Mondstation", "isbn": "9783785583173"}, {"id": 9, "title": "Das Geheimnis der Delfine", "isbn": "9783785587577"}, {"id": 10, "title": "Ritt durch den Wilden Westen", "isbn": "9783785587584"}, {"id": 11, "title": "Im Reich der Löwen", "isbn": "9783785587607"}, {"id": 12, "title": "Rettung für die kleinen Eisbären", "isbn": "9783785587614"}, {"id": 13, "title": "Der große Vulkanausbruch", "isbn": "9783785589366"}, {"id": 14, "title": "Gefahr im Drachenreich", "isbn": "9783785589373"}, {"id": 15, "title": "Abenteuer bei den Wikingern", "isbn": "—"}, {"id": 16, "title": "Auf dem Pfad der Indianer", "isbn": "9783785589397"}, {"id": 17, "title": "Auf der Spur des Tigers", "isbn": "9783743202870"}, {"id": 18, "title": "Kleines Känguru in Gefahr", "isbn": "9783743202887"}, {"id": 19, "title": "Das Geheimnis von Olympia", "isbn": "9783743203495"}, {"id": 20, "title": "SOS auf der Titanic", "isbn": "9783743205635"}, {"id": 21, "title": "Rettung vor dem Wirbelsturm", "isbn": "9783743203501"}, {"id": 22, "title": "Flucht vor dem Erdbeben", "isbn": "9783743206281"}, {"id": 23, "title": "Lampenfieber vor dem großen Auftritt", "isbn": "9783743207653"}, {"id": 24, "title": "Gorilla-Baby in Not", "isbn": "9783743207660"}, {"id": 25, "title": "Bedrohung im Paradies", "isbn": "9783743209589"}, {"id": 26, "title": "König Artus und die Mission der Ritter", "isbn": "9783743209596"}, {"id": 27, "title": "Geheimauftrag im Spukschloss", "isbn": "9783743209602"}, {"id": 28, "title": "Das geheimnisvolle Zauberschwert", "isbn": "9783743209619"}, {"id": 29, "title": "Im Reich des Eiszauberers", "isbn": "9783743212220"}, {"id": 30, "title": "Der Herrscher der Meere", "isbn": "9783743212770"}, {"id": 31, "title": "Der verborgene Wüstenschatz", "isbn": "9783743212787"}, {"id": 32, "title": "Geheimtreffen auf dem Eiffelturm", "isbn": "9783743212794"}, {"id": 33, "title": "Auf den Spuren des verzauberten Einhorns", "isbn": "9783743212800"}, {"id": 34, "title": "Drachenabenteuer bei den Samurai", "isbn": "9783743216631"}, {"id": 35, "title": "Leonardos Traum vom Fliegen", "isbn": "9783743216648"}, {"id": 36, "title": "Suche nach dem Seeungeheuer", "isbn": "9783743216655"}, {"id": 37, "title": "Reise zu den Pinguinen", "isbn": "9783743216662"}, {"id": 38, "title": "Das Geheimnis der Elfen", "isbn": "9783743219458"}, {"id": 39, "title": "Der Angriff der Königskobra", "isbn": "9783743219465"}, {"id": 40, "title": "Lawinenhunde im Einsatz", "isbn": "9783743219472"}, {"id": 41, "title": "Rettung für die Panda-Babys", "isbn": "9783743219489"}, {"id": 42, "title": "Das rätselhafte schwarze Pferd", "isbn": "9783743223011"}, {"id": 43, "title": "Das Fußballspiel des Jahrhunderts", "isbn": "9783743223028"}].map(book => ({
+      ...book, isbn: book.id === 1 ? "9783785581964" : book.id === 15 ? "9783785589380" : book.isbn,
+      series: "junior", key: `j:${book.id}`, icon: "🌟",
+      cover: JUNIOR_COVERS[book.id - 1] || `https://pictures.abebooks.com/isbn/${book.isbn}-de.jpg`,
+      topic: "Junior · ab 6 Jahren", summary: `Anne und Philipp erleben das Abenteuer „${book.title}“ in der farbig illustrierten Junior-Ausgabe.`, year: "—"
+    }));
+    const RESEARCH = [{"id": 1, "title": "Forscherhandbuch Dinosaurier", "related": 1}, {"id": 2, "title": "Forscherhandbuch Ritter", "related": 2}, {"id": 3, "title": "Forscherhandbuch Mumien", "related": 3}, {"id": 4, "title": "Forscherhandbuch Piraten", "related": 4}, {"id": 5, "title": "Forscherhandbuch Regenwald", "related": 6}, {"id": 6, "title": "Forscherhandbuch Eiszeit", "related": 7}, {"id": 7, "title": "Forscherhandbuch Delfine und Haie", "related": 9}, {"id": 8, "title": "Forscherhandbuch Eisbären", "related": 12}, {"id": 9, "title": "Forscherhandbuch Altes Rom", "related": 13}, {"id": 10, "title": "Forscherhandbuch Olympia", "related": 19}, {"id": 11, "title": "Forscherhandbuch Wirbelstürme", "related": 20}, {"id": 12, "title": "Forscherhandbuch Leonardo da Vinci", "related": 36}, {"id": 13, "title": "Forscherhandbuch Tiefsee", "related": 37}, {"id": 14, "title": "Forscherhandbuch Pinguine", "related": 38}, {"id": 15, "title": "Das große Forscherhandbuch", "related": null}].map(book => ({
+      ...book, series: "research", key: `f:${book.id}`, icon: "🔎",
+      isbn: RESEARCH_ISBNS[book.id - 1],
+      cover: `https://pictures.abebooks.com/isbn/${RESEARCH_ISBNS[book.id - 1]}-de.jpg`,
+      topic: book.related ? `Sachwissen · passend zu Hauptband ${book.related}` : "Sachwissen · Sammelband",
+      summary: book.related ? `Ein Sachbuch mit Hintergrundwissen zum Thema des Baumhaus-Abenteuers Band ${book.related}.` : "Ein Sammelband mit Sachwissen zu verschiedenen Themen des magischen Baumhauses.",
+      year: "—"
+    }));
+    BOOKS.forEach(book => { book.series = "main"; book.key = `h:${book.id}`; });
+    const ALL_BOOKS = [...BOOKS, ...JUNIOR, ...RESEARCH];
+    const BOOK_KEYS = new Set(ALL_BOOKS.map(book => book.key));
+    const SERIES_LABELS = { all: "Alle Reihen", main: "Hauptreihe", junior: "Junior-Reihe", research: "Forscherhandbücher" };
+    // Junior ist teils anders nummeriert als die Hauptreihe (z. B. Titanic: Junior 20, Hauptreihe 22).
+    const JUNIOR_TO_MAIN = [
+      ...Array.from({ length: 19 }, (_, index) => index + 1),
+      22, 20, 21, 23, 24, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 41, 43, 44, 46, 47, 50
+    ];
+    const MAIN_TO_JUNIOR = new Map(JUNIOR_TO_MAIN.map((mainId, index) => [mainId, index + 1]));
+    function seriesBooks() { return state.series === "all" ? ALL_BOOKS : ALL_BOOKS.filter(book => book.series === state.series); }
+    function bookLabel(book) { return book.series === "research" ? (book.related ? `Zu Band ${book.related}` : "Sammelband") : `Band ${book.id}`; }
+    function editionLabel(book, status) {
+      if (book.series === "research") return "";
+      const mainId = book.series === "main" ? book.id : JUNIOR_TO_MAIN[book.id - 1];
+      const juniorId = MAIN_TO_JUNIOR.get(mainId);
+      if (!juniorId) return "";
+      const editions = [];
+      if (state[status].has(`h:${mainId}`)) editions.push(`Hauptreihe (Band ${mainId})`);
+      if (state[status].has(`j:${juniorId}`)) editions.push(`Junior (Band ${juniorId})`);
+      const label = { owned: "Im Besitz", read: "Gelesen", wishlist: "Wunschliste" }[status];
+      return editions.length ? `${label}: ${editions.join(" und ")}` : "";
+    }
+    function exportEditionValue(book, status) {
+      if (book.series === "research") return state[status].has(book.key) ? "Ja" : "–";
+      const mainId = book.series === "main" ? book.id : JUNIOR_TO_MAIN[book.id - 1];
+      const juniorId = MAIN_TO_JUNIOR.get(mainId);
+      const normal = state[status].has(`h:${mainId}`);
+      const junior = juniorId && state[status].has(`j:${juniorId}`);
+      if (normal && junior) return "Beide";
+      if (normal) return "Normal";
+      if (junior) return "Junior";
+      return "–";
+    }
+    function coverImage(book, parent, large = false) {
+      const isbn = book.isbn.replace(/\D/g, "");
+      const sources = [
+        book.cover,
+        isbn ? `https://pictures.abebooks.com/isbn/${isbn}-de.jpg` : "",
+        isbn ? `https://buch.isbn.de/cover/${isbn}.jpg` : "",
+        isbn ? `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg?default=false` : ""
+      ].filter((url, index, all) => url && all.indexOf(url) === index);
+      if (!sources.length) return;
+      const img = document.createElement("img");
+      img.alt = `Cover von ${book.title}`;
+      if (!large) { img.loading = "lazy"; img.decoding = "async"; }
+      let next = 0;
+      img.addEventListener("error", () => {
+        if (next < sources.length) img.src = sources[next++];
+        else img.remove();
+      });
+      parent.append(img);
+      img.src = sources[next++];
+    }
+
     const STORAGE_KEY = "magisches-baumhaus-sammlung-v1";
     const savedCollection = loadCollection();
     const state = {
@@ -774,6 +894,7 @@
       read: savedCollection.read,
       wishlist: savedCollection.wishlist,
       filter: "all",
+      series: "all",
       search: "",
       sort: "asc"
     };
@@ -787,18 +908,16 @@
     let toastTimer;
 
     function validSet(values) {
-      return new Set((Array.isArray(values) ? values : []).map(Number).filter(id => Number.isInteger(id) && id >= 1 && id <= BOOKS.length));
+      return new Set((Array.isArray(values) ? values : []).map(id =>
+        /^(?:[1-9]|[1-5][0-9]|6[0-3])$/.test(String(id)) ? `h:${id}` : String(id)
+      ).filter(key => BOOK_KEYS.has(key)));
     }
 
     function loadCollection() {
       try {
         const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
         const owned = Array.isArray(stored) ? stored : stored?.owned;
-        return {
-          owned: validSet(owned),
-          read: validSet(stored?.read),
-          wishlist: validSet(stored?.wishlist)
-        };
+        return { owned: validSet(owned), read: validSet(stored?.read), wishlist: validSet(stored?.wishlist) };
       } catch (_) {
         return { owned: new Set(), read: new Set(), wishlist: new Set() };
       }
@@ -806,10 +925,8 @@
 
     function persist() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        version: 2,
-        owned: [...state.owned].sort((a, b) => a - b),
-        read: [...state.read].sort((a, b) => a - b),
-        wishlist: [...state.wishlist].sort((a, b) => a - b)
+        version: 3,
+        owned: [...state.owned].sort(), read: [...state.read].sort(), wishlist: [...state.wishlist].sort()
       }));
     }
 
@@ -819,21 +936,28 @@
 
     function filteredBooks() {
       const query = normalize(state.search.trim());
-      return BOOKS
+      return seriesBooks()
         .filter(book => {
-          const owned = state.owned.has(book.id);
+          const owned = state.owned.has(book.key);
           const filterMatch = state.filter === "all"
             || (state.filter === "owned" && owned)
             || (state.filter === "missing" && !owned)
-            || (state.filter === "read" && state.read.has(book.id))
-            || (state.filter === "wishlist" && state.wishlist.has(book.id));
-          const haystack = normalize(`${book.id} band ${book.id} ${book.title} ${book.topic} ${book.summary} ${book.year} ${book.isbn}`);
+            || (state.filter === "read" && state.read.has(book.key))
+            || (state.filter === "wishlist" && state.wishlist.has(book.key));
+          const haystack = normalize(`${SERIES_LABELS[book.series]} ${book.id} band ${book.id} ${book.title} ${book.topic} ${book.summary} ${book.year} ${book.isbn}`);
           return filterMatch && (!query || haystack.includes(query));
         })
         .sort((a, b) => {
-          if (state.sort === "desc") return b.id - a.id;
           if (state.sort === "title") return a.title.localeCompare(b.title, "de");
-          return a.id - b.id;
+          const direction = state.sort === "desc" ? -1 : 1;
+          if (state.series !== "all") return (a.id - b.id) * direction;
+          if (a.series === "research" && !a.related) return b.series === "research" && !b.related ? 0 : 1;
+          if (b.series === "research" && !b.related) return -1;
+          const story = book => book.series === "main" ? book.id : book.series === "junior" ? JUNIOR_TO_MAIN[book.id - 1] : book.related;
+          const storyDifference = story(a) - story(b);
+          if (storyDifference) return storyDifference * direction;
+          const order = { main: 0, junior: 1, research: 2 };
+          return order[a.series] - order[b.series] || (a.id - b.id) * direction;
         });
     }
 
@@ -852,19 +976,22 @@
         booksEl.append(fragment);
       }
 
-      const owned = state.owned.size;
+      const currentBooks = seriesBooks();
+      const total = currentBooks.length;
+      const owned = currentBooks.filter(book => state.owned.has(book.key)).length;
       document.getElementById("ownedCount").textContent = owned;
-      document.getElementById("readCount").textContent = state.read.size;
-      document.getElementById("wishlistCount").textContent = state.wishlist.size;
-      document.getElementById("missingCount").textContent = `${BOOKS.length - owned} fehlen`;
+      document.getElementById("totalCount").textContent = total;
+      document.getElementById("readCount").textContent = currentBooks.filter(book => state.read.has(book.key)).length;
+      document.getElementById("wishlistCount").textContent = currentBooks.filter(book => state.wishlist.has(book.key)).length;
+      document.getElementById("missingCount").textContent = `${total - owned} fehlen`;
       document.getElementById("resultCount").textContent = `${shown.length} ${shown.length === 1 ? "Buch" : "Bücher"}`;
-      document.getElementById("progressFill").style.width = `${owned / BOOKS.length * 100}%`;
+      document.getElementById("progressFill").style.width = `${total ? owned / total * 100 : 0}%`;
       clearSearchEl.hidden = !state.search;
     }
 
     function createCard(book) {
-      const owned = state.owned.has(book.id);
-      const wished = state.wishlist.has(book.id);
+      const owned = state.owned.has(book.key);
+      const wished = state.wishlist.has(book.key);
       const card = document.createElement("article");
       card.className = `book-card${owned ? " owned" : ""}${wished ? " wished" : ""}`;
       card.style.setProperty("--hue", `${(book.id * 31 + 90) % 360}`);
@@ -872,19 +999,13 @@
       const cover = document.createElement("div");
       cover.className = "mini-cover";
       cover.innerHTML = `<span class="book-icon">${book.icon}</span><span class="cover-no">${book.id}</span>`;
-      const coverImage = document.createElement("img");
-      coverImage.src = book.cover;
-      coverImage.alt = `Cover von ${book.title}`;
-      coverImage.loading = "lazy";
-      coverImage.decoding = "async";
-      coverImage.addEventListener("error", () => coverImage.remove());
-      cover.append(coverImage);
+      coverImage(book, cover);
 
       const copy = document.createElement("div");
       copy.className = "book-copy";
       const band = document.createElement("p");
       band.className = "band";
-      band.textContent = `Band ${book.id}`;
+      band.textContent = state.series === "all" ? `${SERIES_LABELS[book.series]} · ${bookLabel(book)}` : bookLabel(book);
       const title = document.createElement("h2");
       title.className = "book-title";
       title.textContent = book.title;
@@ -896,13 +1017,22 @@
       info.type = "button";
       info.textContent = "Informationen";
       info.addEventListener("click", () => openModal(book));
-      copy.append(band, title, topic, info);
+      copy.append(band, title, topic);
+      for (const status of ["owned", "read", "wishlist"]) {
+        const label = editionLabel(book, status);
+        if (!label) continue;
+        const editions = document.createElement("p");
+        editions.className = `edition-state${status === "wishlist" ? " wishlist" : ""}`;
+        editions.textContent = label;
+        copy.append(editions);
+      }
+      copy.append(info);
 
       const actions = document.createElement("div");
       actions.className = "status-actions";
       actions.append(
         createStatusButton(book, "owned", "✓ Besitz", owned),
-        createStatusButton(book, "read", "✓ Gelesen", state.read.has(book.id)),
+        createStatusButton(book, "read", "✓ Gelesen", state.read.has(book.key)),
         createStatusButton(book, "wishlist", "♡ Wunschliste", wished)
       );
 
@@ -918,8 +1048,46 @@
       button.setAttribute("aria-pressed", String(active));
       button.setAttribute("aria-label", `${book.title}: ${label.replace(/[✓♡]/g, "").trim()}`);
       button.textContent = label;
-      button.addEventListener("click", () => toggleStatus(book.id, status));
+      button.addEventListener("click", () => chooseStatusEdition(book, status));
       return button;
+    }
+
+    function chooseStatusEdition(book, status) {
+      if (book.series === "research") return toggleStatus(book.key, status);
+      const mainId = book.series === "main" ? book.id : JUNIOR_TO_MAIN[book.id - 1];
+      const juniorId = MAIN_TO_JUNIOR.get(mainId);
+      if (!juniorId) return toggleStatus(book.key, status);
+
+      const statusText = { owned: "Besitz", read: "Gelesen", wishlist: "Wunschliste" }[status];
+      document.getElementById("editionBook").textContent = book.title;
+      document.getElementById("editionTitle").textContent = `${statusText}: Ausgabe wählen`;
+      const options = document.getElementById("editionOptions");
+      options.replaceChildren();
+      for (const [key, name] of [[`h:${mainId}`, `Hauptreihe · Band ${mainId}`], [`j:${juniorId}`, `Junior · Band ${juniorId}`]]) {
+        const selected = state[status].has(key);
+        const option = document.createElement("button");
+        option.type = "button";
+        option.className = "edition-option";
+        option.setAttribute("aria-pressed", String(selected));
+        const heading = document.createElement("strong");
+        heading.textContent = name;
+        const detail = document.createElement("small");
+        detail.textContent = selected ? "Markierung entfernen" : "Markieren";
+        option.append(heading, detail);
+        option.addEventListener("click", () => {
+          closeEditionPicker();
+          toggleStatus(key, status);
+        });
+        options.append(option);
+      }
+      document.getElementById("editionBackdrop").hidden = false;
+      document.body.style.overflow = "hidden";
+      options.firstElementChild.focus();
+    }
+
+    function closeEditionPicker() {
+      document.getElementById("editionBackdrop").hidden = true;
+      document.body.style.overflow = "";
     }
 
     function toggleStatus(id, status) {
@@ -935,26 +1103,33 @@
     }
 
     function openModal(book) {
-      const owned = state.owned.has(book.id);
-      document.getElementById("modalBand").textContent = `Band ${book.id} von ${BOOKS.length}`;
+      const owned = state.owned.has(book.key);
+      document.getElementById("modalBand").textContent = `${SERIES_LABELS[book.series]} · ${bookLabel(book)}`;
       document.getElementById("modalTitle").textContent = book.title;
       const modalArt = document.getElementById("modalIcon");
       modalArt.textContent = book.icon;
-      const modalCover = document.createElement("img");
-      modalCover.src = book.cover;
-      modalCover.alt = `Cover von ${book.title}`;
-      modalCover.addEventListener("error", () => modalCover.remove());
-      modalArt.append(modalCover);
+      coverImage(book, modalArt, true);
       document.getElementById("modalDescription").textContent = book.summary;
       document.getElementById("modalTopic").textContent = book.topic;
       document.getElementById("modalYear").textContent = book.year;
       document.getElementById("modalIsbn").textContent = book.isbn;
+      document.getElementById("modalAge").textContent = book.series === "junior" ? "ab 6 Jahren" : "ab 8 Jahren";
+      document.getElementById("modalPublisherLink").href = book.series === "junior" ? "https://www.loewe-verlag.de/kinderbuecher/marken/das-magische-baumhaus/magisches-baumhaus-junior/" : "https://www.loewe-verlag.de/kinderbuecher/marken/das-magische-baumhaus/";
       const statuses = [
         owned ? "Im Besitz" : "Nicht im Besitz",
-        state.read.has(book.id) ? "Gelesen" : null,
-        state.wishlist.has(book.id) ? "Wunschliste" : null
+        state.read.has(book.key) ? "Gelesen" : null,
+        state.wishlist.has(book.key) ? "Wunschliste" : null
       ].filter(Boolean);
       document.getElementById("modalStatus").textContent = statuses.join(" · ");
+      for (const [status, labelId, factId] of [
+        ["owned", "modalOwnedEdition", "modalOwnedEditionFact"],
+        ["read", "modalReadEdition", "modalReadEditionFact"],
+        ["wishlist", "modalWishlistEdition", "modalWishlistEditionFact"]
+      ]) {
+        const label = editionLabel(book, status);
+        document.getElementById(labelId).textContent = label;
+        document.getElementById(factId).hidden = !label;
+      }
       modalBackdrop.hidden = false;
       document.body.style.overflow = "hidden";
       document.getElementById("closeModal").focus();
@@ -980,34 +1155,31 @@
       });
     });
 
+    document.querySelectorAll(".series-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        state.series = button.dataset.series;
+        document.querySelectorAll(".series-btn").forEach(item => item.classList.toggle("active", item === button));
+        document.getElementById("sort").options[0].textContent = "Band aufsteigend";
+        document.getElementById("sort").options[1].textContent = "Band absteigend";
+        render();
+      });
+    });
+
     searchEl.addEventListener("input", () => { state.search = searchEl.value; render(); });
     clearSearchEl.addEventListener("click", () => { searchEl.value = ""; state.search = ""; searchEl.focus(); render(); });
     sortEl.addEventListener("change", () => { state.sort = sortEl.value; render(); });
 
     document.getElementById("closeModal").addEventListener("click", closeModal);
     modalBackdrop.addEventListener("click", event => { if (event.target === modalBackdrop) closeModal(); });
-    document.addEventListener("keydown", event => { if (event.key === "Escape" && !modalBackdrop.hidden) closeModal(); });
-
-    function drawCheckbox(context, centerX, centerY, active, color) {
-      const size = 27;
-      context.lineWidth = 3;
-      context.strokeStyle = active ? color : "#aab5b0";
-      context.fillStyle = active ? color : "#ffffff";
-      context.beginPath();
-      context.roundRect(centerX - size / 2, centerY - size / 2, size, size, 5);
-      context.fill();
-      context.stroke();
-      if (!active) return;
-      context.strokeStyle = "#ffffff";
-      context.lineWidth = 4;
-      context.lineCap = "round";
-      context.lineJoin = "round";
-      context.beginPath();
-      context.moveTo(centerX - 8, centerY);
-      context.lineTo(centerX - 2, centerY + 7);
-      context.lineTo(centerX + 9, centerY - 8);
-      context.stroke();
-    }
+    document.getElementById("editionCancel").addEventListener("click", closeEditionPicker);
+    document.getElementById("editionBackdrop").addEventListener("click", event => {
+      if (event.target === event.currentTarget) closeEditionPicker();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key !== "Escape") return;
+      if (!document.getElementById("editionBackdrop").hidden) closeEditionPicker();
+      else if (!modalBackdrop.hidden) closeModal();
+    });
 
     function canvasToJpg(canvas, filename) {
       return new Promise((resolve, reject) => {
@@ -1043,7 +1215,7 @@
       const rowsPerPage = 31;
       const totalPages = Math.ceil(exportBooks.length / rowsPerPage);
       const columns = [
-        ["Band", 90], ["Titel", 920], ["Jahr", 144], ["Gelesen", 160]
+        ["Band", 90], ["Titel", 600], ["Jahr", 90], ["Besitz", 178], ["Gelesen", 178], ["Wunschliste", 178]
       ];
       const files = [];
       const canvas = document.createElement("canvas");
@@ -1058,7 +1230,7 @@
         context.fillStyle = "#111b17";
         context.font = "bold 48px Georgia, serif";
         context.textAlign = "left";
-        context.fillText(selectionName, margin, 72);
+        context.fillText(`${SERIES_LABELS[state.series]} · ${selectionName}`, margin, 72);
 
         const headerY = 130;
         const headerHeight = 54;
@@ -1096,15 +1268,20 @@
           context.fillStyle = "#1f2a26";
           context.font = "20px Arial, sans-serif";
           context.textAlign = "center";
-          context.fillText(book.id, x + columns[0][1] / 2, centerY);
+          context.fillText(book.series === "research" ? (book.related || "–") : book.id, x + columns[0][1] / 2, centerY);
           x += columns[0][1];
           context.textAlign = "left";
-          context.fillText(book.title, x + 15, centerY);
+          context.fillText(book.title, x + 15, centerY, columns[1][1] - 28);
           x += columns[1][1];
           context.textAlign = "center";
-          context.fillText(book.year, x + columns[2][1] / 2, centerY);
+          context.fillText(book.year === "—" ? "" : book.year, x + columns[2][1] / 2, centerY);
           x += columns[2][1];
-          drawCheckbox(context, x + columns[3][1] / 2, centerY, state.read.has(book.id), "#176b54");
+          context.font = "18px Arial, sans-serif";
+          context.fillText(exportEditionValue(book, "owned"), x + columns[3][1] / 2, centerY, columns[3][1] - 12);
+          x += columns[3][1];
+          context.fillText(exportEditionValue(book, "read"), x + columns[4][1] / 2, centerY, columns[4][1] - 12);
+          x += columns[4][1];
+          context.fillText(exportEditionValue(book, "wishlist"), x + columns[5][1] / 2, centerY, columns[5][1] - 12);
         });
 
         context.fillStyle = "#68756f";
@@ -1112,7 +1289,7 @@
         context.textAlign = "right";
         context.fillText(`Seite ${page + 1} von ${totalPages}`, width - margin, height - 38);
 
-        files.push(await canvasToJpg(canvas, `magisches-baumhaus-${filenamePart}-${page + 1}-von-${totalPages}.jpg`));
+        files.push(await canvasToJpg(canvas, `magisches-baumhaus-${state.series}-${filenamePart}-${page + 1}-von-${totalPages}.jpg`));
       }
       return files;
     }
@@ -1131,7 +1308,7 @@
     document.getElementById("exportBtn").addEventListener("click", async () => {
       const data = JSON.stringify({
         app: "Das magische Baumhaus – Sammlung",
-        version: 2,
+        version: 3,
         exportedAt: new Date().toISOString(),
         owned: [...state.owned].sort((a, b) => a - b),
         read: [...state.read].sort((a, b) => a - b),
@@ -1165,7 +1342,7 @@
           await navigator.share({ files, title: "Magisches Baumhaus Druckliste" });
         } else {
           files.forEach((file, index) => setTimeout(() => downloadFile(file), index * 300));
-          showToast("Drei JPG-Seiten wurden erstellt.");
+          showToast(`${files.length} JPG-${files.length === 1 ? "Seite wurde" : "Seiten wurden"} erstellt.`);
         }
       } catch (error) {
         if (error?.name !== "AbortError") showToast("JPG-Liste konnte nicht erstellt werden.");
@@ -1199,7 +1376,7 @@
 
     document.getElementById("resetBtn").addEventListener("click", () => {
       if (!state.owned.size && !state.read.size && !state.wishlist.size) return showToast("Es sind noch keine Bücher markiert.");
-      if (confirm("Wirklich Besitz, Lesestand und Wunschliste vollständig löschen?")) {
+      if (confirm("Wirklich Besitz, Lesestand und Wunschliste in allen drei Reihen vollständig löschen?")) {
         state.owned.clear();
         state.read.clear();
         state.wishlist.clear();
